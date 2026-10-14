@@ -62,6 +62,25 @@ test('el hero ocupa la pantalla completa', async ({ page }) => {
   expect(hero!.height).toBeGreaterThanOrEqual(viewport.height - 1);
 });
 
+test('la foto del hero y el logo del footer cargan de verdad', async ({
+  page,
+}) => {
+  await page.goto('./');
+  const hero = page.locator('section.hero img');
+  await expect(hero).toHaveAttribute('fetchpriority', 'high');
+  await expect
+    .poll(() => hero.evaluate((el: HTMLImageElement) => el.naturalWidth))
+    .toBeGreaterThan(0);
+
+  const logo = page.getByRole('contentinfo').getByRole('img', {
+    name: 'Soul matcha',
+  });
+  await logo.scrollIntoViewIfNeeded();
+  await expect
+    .poll(() => logo.evaluate((el: HTMLImageElement) => el.naturalWidth))
+    .toBeGreaterThan(0);
+});
+
 test('el footer tiene legal, mapa del sitio y espacio para el logo', async ({
   page,
 }) => {

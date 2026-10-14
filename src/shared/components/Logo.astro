@@ -1,4 +1,7 @@
 ---
+import { Image } from 'astro:assets';
+import footerLogo from '../assets/logo-footer.jpg';
+
 interface Props {
   /** `header`: marca compacta en la barra. `footer`: marca grande a ancho completo. */
   size?: 'header' | 'footer';
@@ -9,12 +12,25 @@ const isDev = import.meta.env.DEV;
 ---
 
 <!--
-  ESPACIO RESERVADO PARA EL LOGO.
-  Cuando la agencia entregue el SVG vectorial, reemplazar el <span> por
-  <img src={logo} alt="" /> (importado desde src/shared/assets/).
-  No recrear el logotipo con la tipografía: el manual exige usarlo como imagen vectorial.
+  HEADER: espacio reservado para el logo.
+  El logo disponible es blanco sobre café: no se ve sobre el vidrio crema.
+  Falta la versión en café/oliva sobre transparente, en SVG (manual §3).
 -->
-<span class:list={['logo', size, { dev: isDev }]} aria-hidden="true"></span>
+{size === 'footer' ? (
+  <div class="footer">
+    <Image
+      src={footerLogo}
+      alt="Soul matcha"
+      format="webp"
+      quality={85}
+      widths={[640, 960, 1280]}
+      sizes="(min-width: 75rem) 75rem, 100vw"
+      loading="lazy"
+    />
+  </div>
+) : (
+  <span class:list={['logo', 'header', { dev: isDev }]} aria-hidden="true" />
+)}
 
 <style>
   .logo {
@@ -28,9 +44,40 @@ const isDev = import.meta.env.DEV;
     block-size: 2.5rem;
   }
 
+  /*
+   * La imagen del logo es cuadrada con el logotipo al centro. Se recorta a 4:3
+   * (el logotipo ocupa ~46 % del alto, 14 % de margen) y se desvanecen los bordes: el fondo del JPEG
+   * difiere 1-2 niveles del café del footer y así no se ve ninguna costura.
+   */
   .footer {
     inline-size: 100%;
-    aspect-ratio: 4 / 1;
+    max-inline-size: 60rem;
+    margin-inline: auto;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    mask-image:
+      linear-gradient(
+        to right,
+        transparent,
+        var(--color-white) 12%,
+        var(--color-white) 88%,
+        transparent
+      ),
+      linear-gradient(
+        to bottom,
+        transparent,
+        var(--color-white) 10%,
+        var(--color-white) 90%,
+        transparent
+      );
+    mask-composite: intersect;
+  }
+
+  .footer :global(img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: center;
   }
 
   /* Solo en desarrollo: hace visible la reserva. En producción queda en blanco. */
