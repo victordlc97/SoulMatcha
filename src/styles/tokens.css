@@ -50,11 +50,19 @@
     var(--color-spanish-white)
   );
 
-  /* Vidrio esmerilado. 82 % de opacidad: sobre un fondo totalmente negro el texto
-     café sigue en 4.6:1 (AA). Revalidar cuando llegue la foto del hero. */
-  --glass-bg: color-mix(in srgb, var(--color-cream) 82%, transparent);
+  /* Vidrio esmerilado.
+     Versión anterior (opaca, por si hay que volver): bg 82 %, blur(20px) saturate(180%).
+     Descartado: brightness(2) cumplía AA pero dejaba el cristal lechoso y el dorado amarillo limón.
+     Medido sobre píxeles reales (texto café, franja sin texto): 55 % → 4.2–4.4 (bajo AA);
+     62 % → escritorio ≥ 4.6 en todo el hero, móvil mínimo 4.3 en un punto del scroll.
+     Sobre superficies oscuras (el footer) el header cambia a la variante `dark`
+     (texto crema, 5.4–6.4). Revalidar si cambia la foto del hero. */
+  --glass-bg: color-mix(in srgb, var(--color-cream) 62%, transparent);
+  --glass-bg-dark: color-mix(in srgb, var(--color-west-coast) 55%, transparent);
+  --glass-border-dark: color-mix(in srgb, var(--color-cream) 25%, transparent);
+  --hover-tint-dark: color-mix(in srgb, var(--color-cream) 14%, transparent);
   --glass-border: color-mix(in srgb, var(--color-white) 55%, transparent);
-  --glass-blur: blur(20px) saturate(180%);
+  --glass-blur: blur(20px) saturate(150%) brightness(1.15);
   --shadow-float:
     0 1px 1px color-mix(in srgb, var(--color-west-coast) 8%, transparent),
     0 12px 32px color-mix(in srgb, var(--color-west-coast) 18%, transparent);

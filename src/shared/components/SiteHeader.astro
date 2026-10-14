@@ -57,6 +57,9 @@ import Logo from './Logo.astro';
     background: var(--glass-bg);
     box-shadow: var(--shadow-float);
     pointer-events: auto;
+    transition:
+      background-color var(--duration-base) var(--ease-out-soft),
+      border-color var(--duration-base) var(--ease-out-soft);
 
     /* stylelint-disable-next-line property-no-vendor-prefix -- Safari < 18 solo entiende la versión con prefijo */
     -webkit-backdrop-filter: var(--glass-blur);
@@ -103,11 +106,27 @@ import Logo from './Logo.astro';
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
     text-decoration: none;
-    transition: background-color var(--duration-fast) var(--ease-out-soft);
+    transition:
+      background-color var(--duration-fast) var(--ease-out-soft),
+      color var(--duration-base) var(--ease-out-soft);
   }
 
   .links a:hover {
     background: var(--hover-tint);
+  }
+
+  /* Sobre el footer oscuro: cristal oscuro con texto crema (ver motion/header-surface.ts). */
+  .site-header[data-surface='dark'] .bar {
+    border-color: var(--glass-border-dark);
+    background: var(--glass-bg-dark);
+  }
+
+  .site-header[data-surface='dark'] .links a {
+    color: var(--text-inverse);
+  }
+
+  .site-header[data-surface='dark'] .links a:hover {
+    background: var(--hover-tint-dark);
   }
 
   @media (width >= 40rem) {
@@ -123,3 +142,9 @@ import Logo from './Logo.astro';
     }
   }
 </style>
+
+<script>
+  import { initHeaderSurface } from '../motion/header-surface';
+
+  initHeaderSurface();
+</script>

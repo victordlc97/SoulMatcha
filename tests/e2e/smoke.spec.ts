@@ -55,6 +55,25 @@ test('el header flota con vidrio y reparte la navegación a ambos lados del logo
   expect(hasBlur).toContain('blur');
 });
 
+test('el header pasa a cristal oscuro sobre el footer y vuelve a claro arriba', async ({
+  page,
+}) => {
+  await page.goto('./');
+  const header = page.locator('.site-header');
+  await expect(header).toHaveAttribute('data-surface', 'light');
+
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect(header).toHaveAttribute('data-surface', 'dark');
+  await expect(
+    page.getByRole('navigation', { name: 'Principal' }).getByRole('link', {
+      name: 'Galería',
+    }),
+  ).toHaveCSS('color', 'rgb(240, 237, 229)');
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(header).toHaveAttribute('data-surface', 'light');
+});
+
 test('el hero ocupa la pantalla completa', async ({ page }) => {
   await page.goto('./');
   const hero = await page.locator('section.hero').boundingBox();
