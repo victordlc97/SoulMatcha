@@ -1,0 +1,258 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../shared/components/Button.astro';
+import SectionTitle from '../shared/components/SectionTitle.astro';
+
+const base = import.meta.env.BASE_URL;
+
+const palette = [
+  { token: '--color-cream', note: 'Provisional' },
+  { token: '--color-spanish-white' },
+  { token: '--color-sundown' },
+  { token: '--color-sweet-pink' },
+  { token: '--color-gold', note: 'Provisional' },
+  { token: '--color-onion', note: 'Provisional' },
+  { token: '--color-west-coast' },
+  { token: '--color-matcha', note: 'Acción' },
+  { token: '--color-matcha-ink', note: 'Texto accesible' },
+];
+
+const sizes = ['xs', 'sm', 'base', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl'];
+const spaces = ['1', '2', '3', '4', '6', '8', '12', '16', '24', '32'];
+---
+
+<BaseLayout
+  title="Tokens de diseño | Soul Matcha"
+  description="Muestra interna de los tokens de diseño."
+  noindex
+>
+  <div class="container page">
+    <SectionTitle level="h1" accent="tokens">
+      Sistema de
+    </SectionTitle>
+    <p class="lead">
+      Página interna para validar los tokens contra el manual de identidad. Los
+      valores se leen de <code>tokens.css</code>, no están duplicados aquí.
+    </p>
+
+    <section aria-labelledby="t-color">
+      <h2 id="t-color" class="h">
+        Color
+      </h2>
+      <ul class="swatches">
+        {palette.map((c) => (
+          <li class="swatch">
+            <span class="chip" style={`background: var(${c.token})`} />
+            <span class="meta">
+              <strong>{c.token.replace('--color-', '')}</strong>
+              <span data-token={c.token} />
+              {c.note && <em>{c.note}</em>}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-contrast">
+      <h2 id="t-contrast" class="h">
+        Combinaciones aprobadas
+      </h2>
+      <div class="pairs">
+        <p class="pair on-canvas">Café sobre crema · 6.96</p>
+        <p class="pair on-alt">Café sobre Spanish White · 5.42</p>
+        <p class="pair on-blush">Café sobre Sundown · 5.40</p>
+        <p class="pair on-inverse">Crema sobre café · 6.96</p>
+        <p class="pair on-inverse gold">
+          Dorado sobre café · 3.87 (solo titulares)
+        </p>
+        <p class="pair on-canvas link">Matcha-ink sobre crema · 4.95</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="t-type">
+      <h2 id="t-type" class="h">
+        Tipografía
+      </h2>
+      <ul class="type">
+        {sizes.map((s) => (
+          <li style={`font-size: var(--text-${s})`}>
+            <span class="label">--text-{s}</span> Do it for you, not them
+          </li>
+        ))}
+      </ul>
+      <p class="family display">
+        Display (Migra → fallback serif): I love you so matcha
+      </p>
+      <p class="family script">Script (Snell Roundhand → fallback): matcha</p>
+    </section>
+
+    <section aria-labelledby="t-space">
+      <h2 id="t-space" class="h">
+        Espaciado
+      </h2>
+      <ul class="spaces">
+        {spaces.map((s) => (
+          <li>
+            <span class="label">--space-{s}</span>
+            <span class="bar" style={`inline-size: var(--space-${s})`} />
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-action">
+      <h2 id="t-action" class="h">
+        Acción
+      </h2>
+      <Button href={`${base}`}>Descubrir</Button>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  // Esperar a `load`: los estilos llegan por una cadena de @import y, antes de
+  // que terminen, getPropertyValue devuelve una cadena vacía.
+  window.addEventListener('load', () => {
+    document.querySelectorAll<HTMLElement>('[data-token]').forEach((el) => {
+      const value = getComputedStyle(document.documentElement).getPropertyValue(
+        el.dataset.token!,
+      );
+      el.textContent = value.trim().toUpperCase();
+    });
+  });
+</script>
+
+<style>
+  .page {
+    display: grid;
+    gap: var(--space-12);
+    padding-block: var(--space-16);
+  }
+
+  .lead {
+    margin-block-start: var(--space-4);
+    color: var(--text-secondary);
+  }
+
+  .h {
+    margin-block-end: var(--space-6);
+    font-size: var(--text-2xl);
+  }
+
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .swatch {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .chip {
+    block-size: var(--space-16);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .meta {
+    display: grid;
+    font-size: var(--text-sm);
+  }
+
+  .meta em {
+    color: var(--text-secondary);
+  }
+
+  .pairs {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .pair {
+    max-width: none;
+    padding: var(--space-4);
+    border-radius: var(--radius-sm);
+  }
+
+  .on-canvas {
+    border: 1px solid var(--border-subtle);
+  }
+
+  .on-alt {
+    background: var(--surface-alt);
+  }
+
+  .on-blush {
+    background: var(--surface-blush);
+  }
+
+  .on-inverse {
+    background: var(--surface-inverse);
+    color: var(--text-inverse);
+  }
+
+  .gold {
+    color: var(--text-accent-on-inverse);
+    font-size: var(--text-xl);
+  }
+
+  .link {
+    color: var(--text-link);
+  }
+
+  .type {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-6);
+    padding: 0;
+    list-style: none;
+  }
+
+  .label {
+    margin-inline-end: var(--space-3);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+  }
+
+  .family {
+    max-width: none;
+    margin-block-end: var(--space-2);
+    font-size: var(--text-2xl);
+  }
+
+  .display {
+    font-family: var(--font-display);
+  }
+
+  .script {
+    font-family: var(--font-script);
+    font-size: var(--text-4xl);
+  }
+
+  .spaces {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .spaces li {
+    display: flex;
+    align-items: center;
+  }
+
+  .spaces .label {
+    min-inline-size: 8rem;
+  }
+
+  .bar {
+    block-size: var(--space-2);
+    background: var(--action);
+  }
+</style>

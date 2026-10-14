@@ -1,0 +1,36 @@
+---
+interface Props {
+  /** Palabra acentuada en script (firma verbal de la marca). Con moderación. */
+  accent?: string;
+  level?: 'h1' | 'h2' | 'h3';
+}
+
+const { accent, level: Tag = 'h2' } = Astro.props;
+---
+
+<Tag class="section-title">
+  <span class="caps">
+    <slot />
+  </span>
+  {accent && <span class="accent">{accent}</span>}
+</Tag>
+
+<style>
+  .section-title {
+    font-size: var(--text-3xl);
+    line-height: var(--leading-tight);
+  }
+
+  .caps {
+    font-family: var(--font-body);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+  }
+
+  /* Snell Roundhand es ilegible en tamaños pequeños: solo en titulares. */
+  .accent {
+    font-family: var(--font-script);
+    font-size: 1.25em;
+  }
+</style>

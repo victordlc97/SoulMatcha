@@ -1,0 +1,9 @@
+/* Montserrat: libre (SIL OFL), autoalojada vía Fontsource. */
+@import url('@fontsource-variable/montserrat/wght.css');
+
+/*
+ * Pendiente de licencia webfont (ver IDENTIDAD-DE-MARCA.md §6.3):
+ * Migra, Snell Roundhand, Gordita.
+ * Cuando existan los .woff2 en public/fonts/, declarar aquí sus @font-face
+ * con font-display: swap.
+ */

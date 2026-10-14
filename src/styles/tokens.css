@@ -1,0 +1,115 @@
+/*
+ * Única fuente de valores de diseño (ver PLANEACION.md §6).
+ * Ningún componente usa HEX, tamaños ni duraciones "a mano".
+ * Los componentes consumen los ROLES SEMÁNTICOS, no la paleta.
+ *
+ * Valores marcados PROVISIONAL esperan confirmación del cliente/agencia
+ * (ver IDENTIDAD-DE-MARCA.md §5.2).
+ */
+:root {
+  /* ── Paleta de marca ─────────────────────────────── */
+  --color-onion: #6f6132; /* PROVISIONAL: muestra del PDF; el texto del manual dice #4B4327 */
+  --color-west-coast: #584f32;
+  --color-sundown: #f6c6d1;
+  --color-sweet-pink: #dcb3bc;
+  --color-spanish-white: #ddd2b6;
+  --color-cream: #f0ede5; /* PROVISIONAL: no está en la paleta del manual */
+  --color-gold: #c6b17c; /* PROVISIONAL: no está en la paleta del manual */
+  --color-white: #fff;
+
+  /* Verde matcha: color de ACCIÓN, nunca de superficie */
+  --color-matcha: #74a12e;
+  --color-matcha-ink: #4f6f1f; /* derivado técnico para texto accesible; validar con diseño */
+
+  /* ── Roles semánticos: color ─────────────────────── */
+  --surface-canvas: var(--color-cream);
+  --surface-alt: var(--color-spanish-white);
+  --surface-blush: var(--color-sundown);
+  --surface-inverse: var(--color-west-coast);
+  --text-primary: var(--color-west-coast);
+  --text-secondary: var(--color-onion);
+  --text-inverse: var(--color-cream);
+  --text-accent-on-inverse: var(
+    --color-gold
+  ); /* solo titulares grandes (3.87:1) */
+
+  --text-link: var(--color-matcha-ink); /* solo sobre crema o blanco (4.95:1) */
+  --action: var(--color-matcha);
+  --action-contrast: var(
+    --color-white
+  ); /* 3.05:1: solo texto grande y en negrita */
+
+  --focus-ring: var(--color-matcha);
+  --border-subtle: var(--color-spanish-white);
+
+  /* Degradado de marca (manual p. 13): café y rosa predominantes, beige secundario */
+  --gradient-brand: linear-gradient(
+    135deg,
+    var(--color-west-coast),
+    var(--color-sundown) 60%,
+    var(--color-spanish-white)
+  );
+
+  /* ── Tipografía ──────────────────────────────────── */
+
+  /* Migra y Snell Roundhand son comerciales: hasta tener licencia webfont
+     se usan los fallbacks. Ver INSTALACION.md §4.2. */
+  --font-display:
+    'Migra', 'Iowan Old Style', 'Palatino Linotype', georgia, serif;
+  --font-body: 'Montserrat Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-script: 'Snell Roundhand', 'Apple Chancery', 'Segoe Script', cursive;
+
+  /* Máximo 3 pesos en todo el sitio */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+
+  /* Escala modular sobre 16 px */
+  --text-xs: 0.75rem; /* 12 px: mínimo absoluto */
+  --text-sm: 0.875rem; /* 14 px */
+  --text-base: 1rem; /* 16 px */
+  --text-lg: 1.25rem; /* 20 px */
+  --text-xl: 1.5rem; /* 24 px */
+  --text-2xl: 1.875rem; /* 30 px */
+  --text-3xl: 2.25rem; /* 36 px */
+  --text-4xl: 3rem; /* 48 px */
+  --text-5xl: 4rem; /* 64 px */
+  --leading-tight: 1.15;
+  --leading-heading: 1.25;
+  --leading-body: 1.55;
+  --tracking-caps: 0.08em;
+  --measure: 65ch; /* línea de texto ≤ 75 caracteres */
+
+  /* ── Espaciado: escala 4/8 px ────────────────────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  /* ── Layout ──────────────────────────────────────── */
+  --gutter: var(--space-4); /* 16 px en móvil */
+  --container-max: 75rem; /* 1200 px */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.75rem;
+  --radius-pill: 999px;
+  --tap-target: 2.75rem; /* 44 px */
+
+  /* ── Motion ──────────────────────────────────────── */
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 600ms;
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@media (width >= 48rem) {
+  :root {
+    --gutter: var(--space-8);
+  }
+}

@@ -29,3 +29,7 @@ pnpm-debug.log*
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Fuentes comerciales sin licencia webfont: no subir al repo público
+public/fonts/*.otf
+public/fonts/*.ttf
