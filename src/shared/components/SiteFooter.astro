@@ -1,0 +1,123 @@
+---
+import { withBase } from '../url';
+import Logo from './Logo.astro';
+
+const year = new Date().getFullYear();
+
+const legal = [
+  { label: 'Aviso de privacidad', href: withBase('privacidad/') },
+  { label: 'Cookies', href: withBase('cookies/') },
+];
+
+const sitemap = [
+  { label: 'Inicio', href: withBase() },
+  { label: 'Galería', href: withBase('#galeria') },
+  { label: 'Nosotros', href: withBase('#nosotros') },
+  { label: 'Sucursales', href: withBase('#sucursales') },
+];
+---
+
+<footer class="site-footer">
+  <div class="container inner">
+    <div class="columns">
+      <nav aria-labelledby="footer-legal">
+        <h2 id="footer-legal">Legal</h2>
+        <ul>
+          {legal.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <nav aria-labelledby="footer-sitemap">
+        <h2 id="footer-sitemap">Mapa del sitio</h2>
+        <ul>
+          {sitemap.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+
+    <div class="wordmark">
+      <Logo size="footer" />
+    </div>
+
+    <p class="copyright">
+      © {year} Soul Matcha. Todos los derechos reservados.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--surface-inverse);
+    color: var(--text-inverse);
+    border-start-start-radius: var(--radius-lg);
+    border-start-end-radius: var(--radius-lg);
+  }
+
+  .inner {
+    display: grid;
+    gap: var(--space-16);
+    padding-block: var(--space-16) var(--space-8);
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8);
+  }
+
+  h2 {
+    margin-block-end: var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-body);
+  }
+
+  ul {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-target);
+    color: var(--text-inverse);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+
+  .copyright {
+    max-inline-size: none;
+    padding-block-start: var(--space-6);
+    border-block-start: 1px solid
+      color-mix(in srgb, var(--text-inverse) 25%, transparent);
+    font-size: var(--text-sm);
+  }
+
+  @media (width >= 48rem) {
+    .columns {
+      grid-template-columns: repeat(2, max-content);
+      gap: var(--space-24);
+    }
+
+    .inner {
+      padding-block-start: var(--space-24);
+    }
+  }
+</style>

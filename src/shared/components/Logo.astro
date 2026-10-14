@@ -1,0 +1,42 @@
+---
+interface Props {
+  /** `header`: marca compacta en la barra. `footer`: marca grande a ancho completo. */
+  size?: 'header' | 'footer';
+}
+
+const { size = 'header' } = Astro.props;
+const isDev = import.meta.env.DEV;
+---
+
+<!--
+  ESPACIO RESERVADO PARA EL LOGO.
+  Cuando la agencia entregue el SVG vectorial, reemplazar el <span> por
+  <img src={logo} alt="" /> (importado desde src/shared/assets/).
+  No recrear el logotipo con la tipografía: el manual exige usarlo como imagen vectorial.
+-->
+<span class:list={['logo', size, { dev: isDev }]} aria-hidden="true"></span>
+
+<style>
+  .logo {
+    display: block;
+    border-radius: var(--radius-sm);
+  }
+
+  /* El logotipo mide mínimo 80.4 px en web (manual de identidad). */
+  .header {
+    inline-size: 5.5rem;
+    block-size: 2.5rem;
+  }
+
+  .footer {
+    inline-size: 100%;
+    aspect-ratio: 4 / 1;
+  }
+
+  /* Solo en desarrollo: hace visible la reserva. En producción queda en blanco. */
+  .dev {
+    outline: 1px dashed currentcolor;
+    outline-offset: -1px;
+    opacity: 0.45;
+  }
+</style>

@@ -1,21 +1,10 @@
 ---
+import Hero from '../features/hero/Hero.astro';
+import AboutSection from '../features/story/AboutSection.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SectionTitle from '../shared/components/SectionTitle.astro';
 ---
 
 <BaseLayout title="Soul Matcha">
-  <div class="container intro">
-    <SectionTitle level="h1" accent="matcha">
-      Life is better with
-    </SectionTitle>
-  </div>
+  <Hero />
+  <AboutSection />
 </BaseLayout>
-
-<style>
-  .intro {
-    display: grid;
-    min-block-size: 100svh;
-    place-content: center;
-    text-align: center;
-  }
-</style>

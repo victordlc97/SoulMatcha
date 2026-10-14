@@ -3,12 +3,13 @@ interface Props {
   /** Palabra acentuada en script (firma verbal de la marca). Con moderación. */
   accent?: string;
   level?: 'h1' | 'h2' | 'h3';
+  id?: string;
 }
 
-const { accent, level: Tag = 'h2' } = Astro.props;
+const { accent, level: Tag = 'h2', id } = Astro.props;
 ---
 
-<Tag class="section-title">
+<Tag class="section-title" id={id}>
   <span class="caps">
     <slot />
   </span>

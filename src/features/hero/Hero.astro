@@ -1,0 +1,83 @@
+---
+/*
+ * Hero a pantalla completa.
+ * Para poner la foto: pasar un <img> al slot "media", por ejemplo
+ *   <Hero><Image slot="media" src={foto} alt="" /></Hero>
+ * La foto es decorativa (alt vacío): el contenido con significado va en HTML real.
+ */
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="media" aria-hidden="true">
+    <slot name="media">
+      <div class="placeholder"></div>
+    </slot>
+  </div>
+
+  <h1 id="hero-title" class="visually-hidden">
+    Soul Matcha
+  </h1>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-block-size: 100svh;
+    overflow: hidden;
+    background: var(--surface-inverse);
+  }
+
+  .media {
+    position: absolute;
+    inset: 0;
+    transform-origin: center;
+  }
+
+  .media :global(img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  /* Reserva visual mientras no hay foto: degradado de marca con luces suaves,
+     para que el zoom y el vidrio del header se puedan evaluar. */
+  .placeholder {
+    inline-size: 100%;
+    block-size: 100%;
+    background:
+      radial-gradient(
+        55% 45% at 72% 28%,
+        color-mix(in srgb, var(--color-sundown) 75%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        45% 55% at 18% 78%,
+        color-mix(in srgb, var(--color-matcha) 45%, transparent),
+        transparent
+      ),
+      var(--gradient-brand);
+  }
+
+  /* Zoom ligado al scroll: solo CSS, sin JavaScript.
+     Navegadores sin animation-timeline muestran la foto estática. */
+  @keyframes zoom-out-of-view {
+    from {
+      transform: scale(1);
+    }
+
+    to {
+      transform: scale(1.25);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+      .media {
+        animation: zoom-out-of-view linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0 100svh;
+        will-change: transform;
+      }
+    }
+  }
+</style>

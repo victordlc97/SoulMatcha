@@ -5,6 +5,10 @@
     { "files": ["src/styles/tokens.css"], "rules": { "color-no-hex": null } }
   ],
   "rules": {
-    "color-no-hex": true
+    "color-no-hex": true,
+    "selector-pseudo-class-no-unknown": [
+      true,
+      { "ignorePseudoClasses": ["global"] }
+    ]
   }
 }

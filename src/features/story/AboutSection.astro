@@ -1,0 +1,92 @@
+---
+import SectionTitle from '../../shared/components/SectionTitle.astro';
+---
+
+<!--
+  SECCIÓN "NOSOTROS" (reserva).
+  Composición asimétrica pensada para: un texto de marca y dos fotografías.
+  Pendiente de contenido del cliente: reemplazar los .frame por <Image> y
+  el bloque .copy por el texto real (idealmente desde src/content/).
+-->
+<section id="nosotros" class="about" aria-labelledby="about-title">
+  <div class="container grid">
+    <div class="copy">
+      <SectionTitle id="about-title">Nosotros</SectionTitle>
+      <p class="pending">Texto de marca pendiente de contenido del cliente.</p>
+    </div>
+
+    <div class="frame tall" aria-hidden="true">
+      Fotografía
+    </div>
+    <div class="frame square" aria-hidden="true">
+      Fotografía
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    padding-block: var(--space-16);
+    scroll-margin-block-start: var(--space-16);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .copy {
+    display: grid;
+    gap: var(--space-6);
+    align-content: start;
+  }
+
+  .pending {
+    color: var(--text-secondary);
+  }
+
+  .frame {
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-lg);
+    background: var(--surface-alt);
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+  }
+
+  .tall {
+    aspect-ratio: 4 / 5;
+  }
+
+  .square {
+    aspect-ratio: 1;
+  }
+
+  @media (width >= 48rem) {
+    .about {
+      padding-block: var(--space-32);
+    }
+
+    /* Texto a la izquierda; dos fotos escalonadas a la derecha. */
+    .grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: var(--space-8);
+      align-items: start;
+    }
+
+    .copy {
+      grid-column: 1 / span 4;
+      position: sticky;
+      inset-block-start: calc(var(--header-offset) + var(--space-24));
+    }
+
+    .tall {
+      grid-column: 6 / span 4;
+    }
+
+    .square {
+      grid-column: 10 / span 3;
+      margin-block-start: var(--space-24);
+    }
+  }
+</style>

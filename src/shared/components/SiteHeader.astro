@@ -1,0 +1,125 @@
+---
+import { withBase } from '../url';
+import Logo from './Logo.astro';
+---
+
+<header class="site-header">
+  <nav class="bar" aria-label="Principal">
+    <ul class="links start">
+      <li>
+        <a href={withBase('#galeria')}>Galería</a>
+      </li>
+      <li>
+        <a href={withBase('#nosotros')}>Nosotros</a>
+      </li>
+    </ul>
+
+    <a class="brand" href={withBase()} aria-label="Soul Matcha, ir al inicio">
+      <Logo size="header" />
+    </a>
+
+    <ul class="links end">
+      <li>
+        <a href={withBase('#sucursales')}>Sucursales</a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset-block-start: var(--header-offset);
+    inset-inline: 0;
+    z-index: var(--z-header);
+    display: flex;
+    justify-content: center;
+    padding-inline: var(--gutter);
+
+    /* El contenedor no captura clics: solo la barra. */
+    pointer-events: none;
+  }
+
+  /* Móvil: logo arriba y enlaces debajo. En una sola fila no caben sin romper el centrado. */
+  .bar {
+    display: grid;
+    grid-template-areas:
+      'brand brand'
+      'start end';
+    grid-template-columns: 1fr 1fr;
+    row-gap: var(--space-1);
+    align-items: center;
+    inline-size: 100%;
+    max-inline-size: 56rem;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    background: var(--glass-bg);
+    box-shadow: var(--shadow-float);
+    pointer-events: auto;
+
+    /* stylelint-disable-next-line property-no-vendor-prefix -- Safari < 18 solo entiende la versión con prefijo */
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+
+  @supports not (backdrop-filter: blur(1px)) {
+    .bar {
+      background: var(--surface-canvas);
+    }
+  }
+
+  .brand {
+    grid-area: brand;
+    justify-self: center;
+    border-radius: var(--radius-sm);
+  }
+
+  .links {
+    display: flex;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .start {
+    grid-area: start;
+    justify-self: start;
+  }
+
+  .end {
+    grid-area: end;
+    justify-self: end;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-target);
+    padding-inline: var(--space-3);
+    border-radius: var(--radius-pill);
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    transition: background-color var(--duration-fast) var(--ease-out-soft);
+  }
+
+  .links a:hover {
+    background: var(--hover-tint);
+  }
+
+  @media (width >= 40rem) {
+    .bar {
+      grid-template-areas: 'start brand end';
+      grid-template-columns: 1fr auto 1fr;
+      padding-inline: var(--space-4);
+      border-radius: var(--radius-pill);
+    }
+
+    .links a {
+      font-size: var(--text-base);
+    }
+  }
+</style>
