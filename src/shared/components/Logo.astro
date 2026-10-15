@@ -13,7 +13,7 @@ const isDev = import.meta.env.DEV;
 
 <!--
   HEADER: espacio reservado para el logo.
-  El logo disponible es blanco sobre café: no se ve sobre el vidrio crema.
+  El logo disponible es blanco sobre rosa: no se ve sobre el vidrio crema.
   Falta la versión en café/oliva sobre transparente, en SVG (manual §3).
 -->
 {size === 'footer' ? (
@@ -22,8 +22,8 @@ const isDev = import.meta.env.DEV;
       src={footerLogo}
       alt="Soul matcha"
       format="webp"
-      quality={85}
-      widths={[640, 960, 1280]}
+      quality={100}
+      widths={[640, 960, 1280, 1600]}
       sizes="(min-width: 75rem) 75rem, 100vw"
       loading="lazy"
     />
@@ -45,39 +45,20 @@ const isDev = import.meta.env.DEV;
   }
 
   /*
-   * La imagen del logo es cuadrada con el logotipo al centro. Se recorta a 4:3
-   * (el logotipo ocupa ~46 % del alto, 14 % de margen) y se desvanecen los bordes: el fondo del JPEG
-   * difiere 1-2 niveles del café del footer y así no se ve ninguna costura.
+   * La imagen (1600×766) trae el logotipo blanco sobre un rosa liso (#DCB2BC) que
+   * coincide con el fondo del footer (--surface-footer = Sweet Pink #DCB3BC, 1 nivel
+   * de diferencia). Se muestra completa y sin recorte ni máscara: el logotipo llega
+   * casi hasta los bordes verticales de la imagen y cualquier desvanecimiento lo corta.
    */
   .footer {
     inline-size: 100%;
     max-inline-size: 60rem;
     margin-inline: auto;
-    aspect-ratio: 4 / 3;
-    overflow: hidden;
-    mask-image:
-      linear-gradient(
-        to right,
-        transparent,
-        var(--color-white) 12%,
-        var(--color-white) 88%,
-        transparent
-      ),
-      linear-gradient(
-        to bottom,
-        transparent,
-        var(--color-white) 10%,
-        var(--color-white) 90%,
-        transparent
-      );
-    mask-composite: intersect;
   }
 
   .footer :global(img) {
     inline-size: 100%;
-    block-size: 100%;
-    object-fit: cover;
-    object-position: center;
+    block-size: auto;
   }
 
   /* Solo en desarrollo: hace visible la reserva. En producción queda en blanco. */

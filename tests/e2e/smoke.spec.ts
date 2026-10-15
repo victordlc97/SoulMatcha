@@ -55,7 +55,7 @@ test('el header flota con vidrio y reparte la navegación a ambos lados del logo
   expect(hasBlur).toContain('blur');
 });
 
-test('el header usa cristal oscuro sobre hero y footer, y claro sobre el lienzo crema', async ({
+test('el header usa cristal oscuro sobre el hero y claro sobre crema y sobre el footer rosa', async ({
   page,
 }) => {
   await page.goto('./');
@@ -75,10 +75,22 @@ test('el header usa cristal oscuro sobre hero y footer, y claro sobre el lienzo 
   await expect(header).toHaveAttribute('data-surface', 'light');
   await expect(link).toHaveCSS('color', 'rgb(88, 79, 50)');
 
-  // Sobre el footer: vuelve a oscuro.
+  // Sobre el footer (rosa, claro): sigue el cristal claro con texto café.
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-  await expect(header).toHaveAttribute('data-surface', 'dark');
-  await expect(link).toHaveCSS('color', 'rgb(240, 237, 229)');
+  await expect(header).toHaveAttribute('data-surface', 'light');
+  await expect(link).toHaveCSS('color', 'rgb(88, 79, 50)');
+});
+
+test('el footer iguala el rosa del logo y usa texto café profundo', async ({
+  page,
+}) => {
+  await page.goto('./');
+  const footer = page.getByRole('contentinfo');
+  await expect(footer).toHaveCSS('background-color', 'rgb(220, 178, 188)');
+  await expect(footer.getByRole('link', { name: 'Cookies' })).toHaveCSS(
+    'color',
+    'rgb(75, 67, 43)',
+  );
 });
 
 test('el hero ocupa la pantalla completa', async ({ page }) => {

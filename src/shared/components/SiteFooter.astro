@@ -17,7 +17,7 @@ const sitemap = [
 ];
 ---
 
-<footer class="site-footer" data-header-surface="dark">
+<footer class="site-footer">
   <div class="container inner">
     <div class="columns">
       <nav aria-labelledby="footer-legal">
@@ -55,8 +55,8 @@ const sitemap = [
 
 <style>
   .site-footer {
-    background: var(--surface-inverse);
-    color: var(--text-inverse);
+    background: var(--surface-footer);
+    color: var(--text-on-footer);
     border-start-start-radius: var(--radius-lg);
     border-start-end-radius: var(--radius-lg);
   }
@@ -93,7 +93,7 @@ const sitemap = [
     display: inline-flex;
     align-items: center;
     min-block-size: var(--tap-target);
-    color: var(--text-inverse);
+    color: var(--text-on-footer);
     text-decoration: none;
   }
 
@@ -106,7 +106,7 @@ const sitemap = [
     max-inline-size: none;
     padding-block-start: var(--space-6);
     border-block-start: 1px solid
-      color-mix(in srgb, var(--text-inverse) 25%, transparent);
+      color-mix(in srgb, var(--text-on-footer) 25%, transparent);
     font-size: var(--text-sm);
   }
 

@@ -10,8 +10,10 @@
   /* ── Paleta de marca ─────────────────────────────── */
   --color-onion: #6f6132; /* PROVISIONAL: muestra del PDF; el texto del manual dice #4B4327 */
   --color-west-coast: #584f32;
+  --color-west-coast-ink: #4b432b; /* derivado técnico (café + 15 % negro) para texto sobre rosa: 5.25:1; café puro da 4.35:1. Validar con diseño */
   --color-sundown: #f6c6d1;
   --color-sweet-pink: #dcb3bc;
+  --color-footer-rose: #dcb2bc;
   --color-spanish-white: #ddd2b6;
   --color-cream: #f0ede5; /* PROVISIONAL: no está en la paleta del manual */
   --color-gold: #c6b17c; /* PROVISIONAL: no está en la paleta del manual */
@@ -26,13 +28,17 @@
   --surface-alt: var(--color-spanish-white);
   --surface-blush: var(--color-sundown);
   --surface-inverse: var(--color-west-coast);
+
+  /* Igual al fondo liso del logo del footer (#DCB2BC en el JPEG). Es el Sweet Pink de la
+     paleta (#DCB3BC) con 1 nivel menos de verde: así no se ve el borde de la imagen. */
+  --surface-footer: var(--color-footer-rose);
   --text-primary: var(--color-west-coast);
   --text-secondary: var(--color-onion);
   --text-inverse: var(--color-cream);
-  --text-accent-on-inverse: var(
-    --color-gold
-  ); /* solo titulares grandes (3.87:1) */
+  --text-on-footer: var(--color-west-coast-ink);
 
+  /* Solo titulares grandes (3.87:1). */
+  --text-accent-on-inverse: var(--color-gold);
   --text-link: var(--color-matcha-ink); /* solo sobre crema o blanco (4.95:1) */
   --action: var(--color-matcha);
   --action-contrast: var(
