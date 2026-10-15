@@ -6,8 +6,8 @@ test('la portada carga con el lienzo crema y el enlace de salto', async ({
 }) => {
   await page.goto('./');
   await expect(page).toHaveTitle('Soul Matcha');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'Soul Matcha',
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    'Life is better with',
   );
 
   const bg = await page.evaluate(
@@ -81,7 +81,7 @@ test('el header usa cristal oscuro sobre el hero y claro sobre crema y sobre el 
   await expect(link).toHaveCSS('color', 'rgb(88, 79, 50)');
 });
 
-test('el footer iguala el rosa del logo y usa texto café profundo', async ({
+test('el footer iguala el rosa del logo y usa texto blanco', async ({
   page,
 }) => {
   await page.goto('./');
@@ -89,7 +89,7 @@ test('el footer iguala el rosa del logo y usa texto café profundo', async ({
   await expect(footer).toHaveCSS('background-color', 'rgb(220, 178, 188)');
   await expect(footer.getByRole('link', { name: 'Cookies' })).toHaveCSS(
     'color',
-    'rgb(75, 67, 43)',
+    'rgb(255, 255, 255)',
   );
 });
 
@@ -142,6 +142,35 @@ test('no hay desbordamiento horizontal en móvil', async ({ page }) => {
     () => document.documentElement.scrollWidth - window.innerWidth,
   );
   expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test('los dos botones del hero llevan a la galería y a la página de sucursales', async ({
+  page,
+}) => {
+  await page.goto('./');
+  const hero = page.locator('section.hero');
+  await expect(
+    hero.getByRole('link', { name: 'Ver producto' }),
+  ).toHaveAttribute('href', '/SoulMatcha/#galeria');
+  await hero.getByRole('link', { name: 'Ver sucursales' }).click();
+  await expect(page).toHaveURL(/\/sucursales\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Sucursales',
+  );
+});
+
+test('la pantalla de carga se oculta al terminar y no vuelve a aparecer en la sesión', async ({
+  page,
+}) => {
+  await page.goto('./');
+  await expect(page.locator('html')).toHaveAttribute('data-loader', 'done', {
+    timeout: 8000,
+  });
+  await expect(page.locator('.loader')).toBeHidden();
+
+  // Segunda carga en la misma sesión: ya viene oculto desde el primer pintado.
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-loader', 'done');
 });
 
 test('la página de tokens no se indexa y resuelve los valores desde el CSS', async ({

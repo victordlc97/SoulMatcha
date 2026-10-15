@@ -1,13 +1,15 @@
 ---
 interface Props {
   href: string;
+  /** `primary`: relleno matcha (acción). `secondary`: contorno claro, para fondos oscuros. */
+  variant?: 'primary' | 'secondary';
 }
 
-const { href } = Astro.props;
+const { href, variant = 'primary' } = Astro.props;
 ---
 
-<!-- Blanco sobre matcha = 3.05:1: solo cumple AA por ser texto grande y en negrita. No reducir. -->
-<a class="button" href={href}>
+<!-- Primary: blanco sobre matcha = 3.05:1, solo cumple AA por ser texto grande y en negrita. No reducir. -->
+<a class:list={['button', variant]} href={href}>
   <slot />
 </a>
 
@@ -16,17 +18,34 @@ const { href } = Astro.props;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: var(--tap-target);
+    min-block-size: var(--tap-target);
     padding: var(--space-3) var(--space-8);
+    border: 2px solid transparent;
     border-radius: var(--radius-pill);
-    background: var(--action);
-    color: var(--action-contrast);
     font-size: var(--text-lg);
     font-weight: var(--weight-bold);
     letter-spacing: var(--tracking-caps);
+    text-align: center;
     text-decoration: none;
     text-transform: uppercase;
-    transition: transform var(--duration-base) var(--ease-out-soft);
+    transition:
+      transform var(--duration-base) var(--ease-out-soft),
+      background-color var(--duration-base) var(--ease-out-soft);
+  }
+
+  .primary {
+    background: var(--action);
+    color: var(--action-contrast);
+  }
+
+  .secondary {
+    border-color: var(--text-inverse);
+    background: transparent;
+    color: var(--text-inverse);
+  }
+
+  .secondary:hover {
+    background: var(--hover-tint-dark);
   }
 
   .button:hover {

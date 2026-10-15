@@ -13,7 +13,7 @@ const sitemap = [
   { label: 'Inicio', href: withBase() },
   { label: 'Galería', href: withBase('#galeria') },
   { label: 'Nosotros', href: withBase('#nosotros') },
-  { label: 'Sucursales', href: withBase('#sucursales') },
+  { label: 'Sucursales', href: withBase('sucursales/') },
 ];
 ---
 
@@ -94,6 +94,7 @@ const sitemap = [
     align-items: center;
     min-block-size: var(--tap-target);
     color: var(--text-on-footer);
+    font-weight: var(--weight-medium);
     text-decoration: none;
   }
 

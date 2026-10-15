@@ -35,7 +35,10 @@
   --text-primary: var(--color-west-coast);
   --text-secondary: var(--color-onion);
   --text-inverse: var(--color-cream);
-  --text-on-footer: var(--color-west-coast-ink);
+
+  /* Blanco por decisión de diseño (no compite con el logo blanco). Sobre el rosa da 1.9:1, bajo AA.
+     Para volver a texto legible: var(--color-west-coast-ink), 5.25:1. */
+  --text-on-footer: var(--color-white);
 
   /* Solo titulares grandes (3.87:1). */
   --text-accent-on-inverse: var(--color-gold);
@@ -72,6 +75,10 @@
      - brightness(2) cumplía AA pero dejaba el cristal lechoso y el dorado amarillo limón.
      Revalidar si cambia la foto del hero. */
   --glass-bg: color-mix(in srgb, var(--color-cream) 62%, transparent);
+
+  /* Tinte para oscurecer fotos bajo texto (degradado del hero): café casi negro, neutro. El café
+     de marca solo ensucia el verde del follaje. */
+  --scrim-ink: color-mix(in srgb, var(--color-west-coast) 30%, black);
   --glass-border: color-mix(in srgb, var(--color-white) 55%, transparent);
   --glass-blur: blur(20px) saturate(150%) brightness(1.15);
   --glass-bg-dark: color-mix(in srgb, var(--color-west-coast) 10%, transparent);
@@ -138,6 +145,7 @@
   ); /* separación de la barra flotante al borde */
 
   --z-header: 50;
+  --z-loader: 200;
 
   /* ── Motion ──────────────────────────────────────── */
   --duration-fast: 150ms;

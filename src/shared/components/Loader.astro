@@ -1,0 +1,108 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo-footer.jpg';
+---
+
+<!--
+  PANTALLA DE CARGA. Mismos colores y logo que el footer (rosa + logo blanco).
+  - Se ve desde el primer pintado y se oculta al terminar `load` (mínimo ~900 ms, para que no parpadee).
+  - Solo aparece una vez por sesión: el script del <head> (BaseLayout) pone data-loader="done"
+    antes del primer pintado si ya se mostró.
+  - Sin JavaScript no se muestra nunca (<noscript> en BaseLayout); además hay un tope de 6 s.
+-->
+<div class="loader" aria-hidden="true">
+  <Image
+    class="logo"
+    src={logo}
+    alt=""
+    format="webp"
+    quality={100}
+    widths={[640, 960, 1280]}
+    sizes="(min-width: 48rem) 38rem, 80vw"
+    loading="eager"
+    fetchpriority="high"
+  />
+</div>
+
+<style>
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-loader);
+    display: grid;
+    place-items: center;
+    background: var(--surface-footer);
+    transition:
+      opacity var(--duration-slow) var(--ease-in-out-soft),
+      visibility 0s linear var(--duration-slow);
+  }
+
+  .loader :global(.logo) {
+    inline-size: min(80vw, 38rem);
+    block-size: auto;
+  }
+
+  :global(html[data-loader='done']) .loader {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* El logo aparece suave y "respira" mientras carga. */
+  @media (prefers-reduced-motion: no-preference) {
+    .loader :global(.logo) {
+      animation:
+        logo-in var(--duration-slow) var(--ease-out-soft) both,
+        logo-breathe 2.4s var(--ease-in-out-soft) var(--duration-slow) infinite
+          alternate;
+    }
+
+    @keyframes logo-in {
+      from {
+        opacity: 0;
+        transform: scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes logo-breathe {
+      to {
+        transform: scale(1.03);
+      }
+    }
+  }
+</style>
+
+<script>
+  const MIN_VISIBLE_MS = 900;
+  const MAX_WAIT_MS = 6000;
+  const html = document.documentElement;
+  const start = performance.now();
+
+  const finish = () => {
+    html.dataset.loader = 'done';
+    try {
+      sessionStorage.setItem('sm-loader-seen', '1');
+    } catch {
+      // Sin almacenamiento (modo privado): el loader se mostrará en cada carga. No es grave.
+    }
+  };
+
+  const finishAfterMinimum = () => {
+    const elapsed = performance.now() - start;
+    window.setTimeout(finish, Math.max(0, MIN_VISIBLE_MS - elapsed));
+  };
+
+  if (document.readyState === 'complete') {
+    finishAfterMinimum();
+  } else {
+    window.addEventListener('load', finishAfterMinimum, { once: true });
+  }
+
+  // Red de seguridad: nunca dejar la página tapada.
+  window.setTimeout(finish, MAX_WAIT_MS);
+</script>

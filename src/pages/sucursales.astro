@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionTitle from '../shared/components/SectionTitle.astro';
+---
+
+<!--
+  PÁGINA DE SUCURSALES (reserva).
+  Pendiente: direcciones, horarios y mapa por sucursal. Cuando lleguen, mover los
+  datos a src/content/ (una entrada por sucursal) y recorrerlos aquí.
+-->
+<BaseLayout
+  title="Sucursales | Soul Matcha"
+  description="Encuentra la sucursal de Soul Matcha más cercana."
+>
+  <section class="branches" aria-labelledby="branches-title">
+    <div class="container">
+      <SectionTitle id="branches-title" level="h1">
+        Sucursales
+      </SectionTitle>
+      <p class="pending">
+        Pronto publicaremos las direcciones de cada sucursal.
+      </p>
+
+      <div class="map" aria-hidden="true">
+        Mapa
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .branches {
+    /* Deja espacio al header flotante, que aquí no tiene hero debajo. */
+    padding-block: var(--space-32) var(--space-16);
+  }
+
+  .pending {
+    margin-block-start: var(--space-4);
+    color: var(--text-secondary);
+  }
+
+  .map {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 9;
+    margin-block-start: var(--space-8);
+    border-radius: var(--radius-lg);
+    background: var(--surface-alt);
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+  }
+
+  @media (width >= 48rem) {
+    .branches {
+      padding-block-end: var(--space-32);
+    }
+  }
+</style>

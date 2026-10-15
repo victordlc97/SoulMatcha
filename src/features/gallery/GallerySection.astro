@@ -1,0 +1,54 @@
+---
+import SectionTitle from '../../shared/components/SectionTitle.astro';
+---
+
+<!--
+  SECCIÓN "GALERÍA" (reserva).
+  Destino del botón "Ver producto" del hero y del enlace "Galería" del menú.
+  Pendiente de fotografía del cliente: reemplazar los .frame por <Image>.
+-->
+<section id="galeria" class="gallery" aria-labelledby="gallery-title">
+  <div class="container">
+    <SectionTitle id="gallery-title">Galería</SectionTitle>
+
+    <div class="grid" aria-hidden="true">
+      <div class="frame">Fotografía</div>
+      <div class="frame">Fotografía</div>
+      <div class="frame">Fotografía</div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .gallery {
+    padding-block: var(--space-16);
+    scroll-margin-block-start: var(--space-16);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-4);
+    margin-block-start: var(--space-8);
+  }
+
+  .frame {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius-lg);
+    background: var(--surface-alt);
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+  }
+
+  @media (width >= 48rem) {
+    .gallery {
+      padding-block: var(--space-32);
+    }
+
+    .grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-8);
+    }
+  }
+</style>

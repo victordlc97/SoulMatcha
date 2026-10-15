@@ -3,13 +3,15 @@ interface Props {
   /** Palabra acentuada en script (firma verbal de la marca). Con moderación. */
   accent?: string;
   level?: 'h1' | 'h2' | 'h3';
+  /** `display`: titular de portada, más grande. */
+  size?: 'section' | 'display';
   id?: string;
 }
 
-const { accent, level: Tag = 'h2', id } = Astro.props;
+const { accent, level: Tag = 'h2', size = 'section', id } = Astro.props;
 ---
 
-<Tag class="section-title" id={id}>
+<Tag class:list={['section-title', size]} id={id}>
   <span class="caps">
     <slot />
   </span>
@@ -20,6 +22,10 @@ const { accent, level: Tag = 'h2', id } = Astro.props;
   .section-title {
     font-size: var(--text-3xl);
     line-height: var(--leading-tight);
+  }
+
+  .display {
+    font-size: clamp(var(--text-3xl), 4.2vw, var(--text-4xl));
   }
 
   .caps {

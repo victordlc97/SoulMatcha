@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Loader from '../shared/components/Loader.astro';
 import SiteFooter from '../shared/components/SiteFooter.astro';
 import SiteHeader from '../shared/components/SiteHeader.astro';
 import { withBase } from '../shared/url';
@@ -33,8 +34,26 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <!-- Antes del primer pintado: si el loader ya se mostró en esta sesión, no lo muestres de nuevo. -->
+    <script is:inline>
+      try {
+        if (sessionStorage.getItem('sm-loader-seen')) {
+          document.documentElement.dataset.loader = 'done';
+        }
+      } catch {
+        // Sin almacenamiento: se muestra el loader.
+      }
+    </script>
+    <noscript>
+      <style>
+        .loader {
+          display: none;
+        }
+      </style>
+    </noscript>
   </head>
   <body>
+    <Loader />
     <a class="skip-link" href="#contenido">
       Ir al contenido
     </a>

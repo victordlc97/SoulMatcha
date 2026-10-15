@@ -1,4 +1,8 @@
 ---
+import Button from '../../shared/components/Button.astro';
+import SectionTitle from '../../shared/components/SectionTitle.astro';
+import { withBase } from '../../shared/url';
+
 /*
  * Hero a pantalla completa.
  * Para poner la foto: pasar un <img> al slot "media", por ejemplo
@@ -14,22 +18,39 @@
     </slot>
   </div>
 
-  <h1 id="hero-title" class="visually-hidden">
-    Soul Matcha
-  </h1>
+  <div class="container content">
+    <div class="title">
+      <SectionTitle id="hero-title" level="h1" size="display" accent="matcha">
+        Life is better with
+      </SectionTitle>
+    </div>
+
+    <div class="actions">
+      <Button href={withBase('#galeria')}>Ver producto</Button>
+      <Button href={withBase('sucursales/')} variant="secondary">
+        Ver sucursales
+      </Button>
+    </div>
+  </div>
 </section>
 
 <style>
   .hero {
     position: relative;
+    display: grid;
+    align-items: end;
     min-block-size: 100svh;
     overflow: hidden;
     background: var(--surface-inverse);
+    color: var(--text-inverse);
   }
 
+  /* Capas explícitas: foto (0) < degradado de legibilidad (1) < contenido (2).
+     Sin z-index el ::before se pintaba DEBAJO de la foto y no se veía. */
   .media {
     position: absolute;
     inset: 0;
+    z-index: 0;
     transform-origin: center;
   }
 
@@ -44,9 +65,70 @@
     block-size: 100%;
     object-fit: cover;
 
-    /* Punto de interés (la lata) al centro de la foto: se mantiene visible en
-       cualquier proporción de pantalla y es el origen del zoom. */
-    object-position: 50% 50%;
+    /* Punto de interés (la lata) casi al centro (50 % en x, 55 % en y): en pantallas anchas deja
+       una franja de follaje oscuro abajo para el texto, y sigue visible en cualquier proporción. */
+    object-position: 50% 55%;
+  }
+
+  /* Degradados de legibilidad: uno vertical y otro localizado en la esquina del texto (no toca la lata).
+     Oscurecen la parte baja para que el texto crema cumpla contraste
+     sobre la mano y el follaje. Va en .hero (no en .media) para que no escale con el zoom. */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      radial-gradient(
+        ellipse 75% 45% at 8% 100%,
+        color-mix(in srgb, var(--scrim-ink) 62%, transparent) 0%,
+        color-mix(in srgb, var(--scrim-ink) 30%, transparent) 60%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to top,
+        color-mix(in srgb, var(--scrim-ink) 82%, transparent) 0%,
+        color-mix(in srgb, var(--scrim-ink) 60%, transparent) 18%,
+        color-mix(in srgb, var(--scrim-ink) 22%, transparent) 36%,
+        transparent 50%
+      );
+    pointer-events: none;
+  }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: var(--space-8);
+    justify-items: start;
+    padding-block: var(--space-24) var(--space-12);
+  }
+
+  /* Sombra suave para el trazo fino del script. */
+  .title {
+    text-shadow: 0 2px 24px
+      color-mix(in srgb, var(--color-west-coast) 70%, transparent);
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-4);
+    inline-size: 100%;
+    max-inline-size: 22rem;
+  }
+
+  @media (width >= 40rem) {
+    .content {
+      padding-block-end: var(--space-16);
+    }
+
+    .actions {
+      flex-direction: row;
+      inline-size: auto;
+      max-inline-size: none;
+    }
   }
 
   /* Reserva visual mientras no hay foto: degradado de marca con luces suaves,
