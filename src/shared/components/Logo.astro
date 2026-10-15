@@ -5,8 +5,12 @@ import logoBrown from '../assets/logo-brown.png';
 import logoWhite from '../assets/logo-white.png';
 
 interface Props {
-  /** `header`: marca compacta en la barra. `footer`: marca grande a ancho completo. */
-  size?: 'header' | 'footer';
+  /**
+   * `header`: marca compacta en la barra (cambia café/blanco según el cristal).
+   * `drawer`: solo la versión café, para el panel lateral (siempre sobre fondo crema).
+   * `footer`: marca grande a ancho completo.
+   */
+  size?: 'header' | 'drawer' | 'footer';
 }
 
 const { size = 'header' } = Astro.props;
@@ -41,15 +45,17 @@ const { size = 'header' } = Astro.props;
       sizes="82px"
       loading="eager"
     />
-    <Image
-      class="on-dark"
-      src={logoWhite}
-      alt=""
-      format="webp"
-      widths={[164, 246, 328]}
-      sizes="82px"
-      loading="eager"
-    />
+    {size === 'header' && (
+      <Image
+        class="on-dark"
+        src={logoWhite}
+        alt=""
+        format="webp"
+        widths={[164, 246, 328]}
+        sizes="82px"
+        loading="eager"
+      />
+    )}
   </span>
 )}
 

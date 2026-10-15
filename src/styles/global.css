@@ -69,6 +69,11 @@ a {
   white-space: nowrap;
 }
 
+/* Con el panel del menú abierto, el fondo no se desplaza. */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
 /* Con el aviso de cookies abierto, el footer gana espacio abajo: el aviso vive ahí y no tapa enlaces. */
 html[data-consent-open] .site-footer {
   padding-block-end: var(--consent-space, 0);

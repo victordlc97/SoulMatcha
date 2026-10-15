@@ -274,3 +274,49 @@ test('el footer ordena mapa, logo y redes/sucursales de izquierda a derecha', as
   expect(sitemap).toBeLessThan(logo);
   expect(logo).toBeLessThan(connect);
 });
+
+test('la barra del header es delgada y en escritorio no muestra el botón de menú', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('./');
+  const bar = await page.locator('nav.bar').boundingBox();
+  expect(bar!.height).toBeLessThanOrEqual(70);
+  await expect(page.getByRole('button', { name: 'Abrir menú' })).toBeHidden();
+});
+
+test('en móvil el menú es un panel lateral que se abre, se cierra con Esc y navega', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto('./');
+
+  // Una sola fila delgada: no crece como antes (eran ~125 px con dos filas).
+  const bar = await page.locator('nav.bar').boundingBox();
+  expect(bar!.height).toBeLessThanOrEqual(70);
+
+  const toggle = page.getByRole('button', { name: 'Abrir menú' });
+  const menu = page.getByRole('dialog', { name: 'Menú principal' });
+  await expect(toggle).toBeVisible();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.locator('nav.bar .links.start')).toBeHidden();
+
+  await toggle.click();
+  await expect(menu).toBeVisible();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  for (const name of ['Galería', 'Nosotros', 'Sucursales']) {
+    await expect(menu.getByRole('link', { name })).toBeVisible();
+  }
+
+  // Esc cierra y devuelve el foco al botón.
+  await page.keyboard.press('Escape');
+  await expect(menu).toBeHidden();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(toggle).toBeFocused();
+
+  // Un enlace del panel navega y cierra el panel.
+  await toggle.click();
+  await menu.getByRole('link', { name: 'Sucursales' }).click();
+  await expect(page).toHaveURL(/\/sucursales\/$/);
+  await expect(menu).toBeHidden();
+});
