@@ -1,6 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import footerLogo from '../assets/logo-footer.jpg';
+import logoBrown from '../assets/logo-brown.png';
+import logoWhite from '../assets/logo-white.png';
 
 interface Props {
   /** `header`: marca compacta en la barra. `footer`: marca grande a ancho completo. */
@@ -8,13 +10,13 @@ interface Props {
 }
 
 const { size = 'header' } = Astro.props;
-const isDev = import.meta.env.DEV;
 ---
 
 <!--
-  HEADER: espacio reservado para el logo.
-  El logo disponible es blanco sobre rosa: no se ve sobre el vidrio crema.
-  Falta la versión en café/oliva sobre transparente, en SVG (manual §3).
+  HEADER: dos versiones del logo apiladas; se ve una u otra según el cristal (ver SiteHeader):
+  - cristal CLARO  -> logo café/oliva (#6F6132), 5.2:1 sobre crema.
+  - cristal OSCURO -> logo blanco, 17.9:1 sobre el cristal oscuro. El café ahí daría 2.9:1.
+  Son PNG con transparencia (la agencia los entregó rasterizados dentro de un SVG): falta el SVG vectorial.
 -->
 {size === 'footer' ? (
   <div class="footer">
@@ -29,19 +31,58 @@ const isDev = import.meta.env.DEV;
     />
   </div>
 ) : (
-  <span class:list={['logo', 'header', { dev: isDev }]} aria-hidden="true" />
+  <span class="header" aria-hidden="true">
+    <Image
+      class="on-light"
+      src={logoBrown}
+      alt=""
+      format="webp"
+      widths={[164, 246, 328]}
+      sizes="82px"
+      loading="eager"
+    />
+    <Image
+      class="on-dark"
+      src={logoWhite}
+      alt=""
+      format="webp"
+      widths={[164, 246, 328]}
+      sizes="82px"
+      loading="eager"
+    />
+  </span>
 )}
 
 <style>
-  .logo {
+  /* El logotipo mide mínimo 80.4 px en web (manual de identidad): ver --logo-header-width. */
+  .header {
+    position: relative;
     display: block;
-    border-radius: var(--radius-sm);
+    inline-size: var(--logo-header-width);
+
+    /* Proporción de los PNG (892×733): reserva el alto antes de que cargue la imagen. */
+    aspect-ratio: 892 / 733;
   }
 
-  /* El logotipo mide mínimo 80.4 px en web (manual de identidad). */
-  .header {
-    inline-size: 5.5rem;
-    block-size: 2.5rem;
+  .header :global(img) {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    transition: opacity var(--duration-base) var(--ease-out-soft);
+  }
+
+  /* Por defecto (y sin JavaScript) se ve el logo café; el blanco aparece sobre cristal oscuro. */
+  .header :global(.on-dark) {
+    opacity: 0;
+  }
+
+  :global(.site-header[data-surface='dark']) .header :global(.on-light) {
+    opacity: 0;
+  }
+
+  :global(.site-header[data-surface='dark']) .header :global(.on-dark) {
+    opacity: 1;
   }
 
   /*
@@ -59,12 +100,5 @@ const isDev = import.meta.env.DEV;
   .footer :global(img) {
     inline-size: 100%;
     block-size: auto;
-  }
-
-  /* Solo en desarrollo: hace visible la reserva. En producción queda en blanco. */
-  .dev {
-    outline: 1px dashed currentcolor;
-    outline-offset: -1px;
-    opacity: 0.45;
   }
 </style>

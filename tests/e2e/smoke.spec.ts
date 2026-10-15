@@ -25,12 +25,20 @@ test('la portada carga con el lienzo crema y el enlace de salto', async ({
   ).toBeFocused();
 });
 
-test('el favicon respeta el base del sitio', async ({ page }) => {
+test('los íconos de pestaña respetan el base y existen', async ({ page }) => {
   await page.goto('./');
-  await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
-    'href',
-    '/SoulMatcha/favicon.svg',
-  );
+  const hrefs = await page
+    .locator('link[rel="icon"], link[rel="apple-touch-icon"]')
+    .evaluateAll((els) => els.map((e) => e.getAttribute('href')));
+  expect(hrefs).toEqual([
+    '/SoulMatcha/favicon.ico',
+    '/SoulMatcha/icon-192.png',
+    '/SoulMatcha/apple-touch-icon.png',
+  ]);
+  for (const href of hrefs) {
+    const res = await page.request.get(href!);
+    expect(res.status(), href!).toBe(200);
+  }
 });
 
 test('el header flota con vidrio y reparte la navegación a ambos lados del logo', async ({
@@ -67,6 +75,12 @@ test('el header usa cristal oscuro sobre el hero y claro sobre crema y sobre el 
   // Sobre el hero (foto oscura): texto crema.
   await expect(header).toHaveAttribute('data-surface', 'dark');
   await expect(link).toHaveCSS('color', 'rgb(240, 237, 229)');
+  // El logo visible es el blanco (el café quedaría a 2.9:1 sobre el cristal oscuro).
+  await expect(page.locator('.site-header .on-dark')).toHaveCSS('opacity', '1');
+  await expect(page.locator('.site-header .on-light')).toHaveCSS(
+    'opacity',
+    '0',
+  );
 
   // Sobre "Nosotros" (lienzo crema): texto café.
   await page.evaluate(() =>
@@ -74,6 +88,12 @@ test('el header usa cristal oscuro sobre el hero y claro sobre crema y sobre el 
   );
   await expect(header).toHaveAttribute('data-surface', 'light');
   await expect(link).toHaveCSS('color', 'rgb(88, 79, 50)');
+  // Y aquí el café/oliva.
+  await expect(page.locator('.site-header .on-light')).toHaveCSS(
+    'opacity',
+    '1',
+  );
+  await expect(page.locator('.site-header .on-dark')).toHaveCSS('opacity', '0');
 
   // Sobre el footer (rosa, claro): sigue el cristal claro con texto café.
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));

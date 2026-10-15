@@ -15,7 +15,8 @@
     "test:e2e": "playwright test",
     "lint": "eslint . && stylelint \"src/**/*.{css,astro}\" --allow-empty-input",
     "format": "prettier --write .",
-    "check": "astro check"
+    "check": "astro check",
+    "icons": "node scripts/build-icons.mjs"
   },
   "dependencies": {
     "@fontsource-variable/montserrat": "^5.3.0",

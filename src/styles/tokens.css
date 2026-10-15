@@ -155,6 +155,7 @@
   --radius-pill: 999px;
   --radius-lg: 1.5rem;
   --tap-target: 2.75rem; /* 44 px */
+  --logo-header-width: 5.1rem; /* 81.6 px: el manual exige mínimo 80.4 px de ancho en web */
   --button-height-sm: 2.5rem; /* 40 px: botones compactos (cumple el mínimo AA de 24 px) */
   --header-offset: var(
     --space-4
