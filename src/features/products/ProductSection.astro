@@ -1,26 +1,29 @@
 ---
+import { getLocale, useTranslations } from '../../i18n';
 import SectionTitle from '../../shared/components/SectionTitle.astro';
+
+const t = useTranslations(getLocale(Astro));
 ---
 
 <!--
-  SECCIÓN "GALERÍA" (reserva).
-  Destino del botón "Ver producto" del hero y del enlace "Galería" del menú.
+  SECCIÓN "PRODUCTO" (reserva; antes "Galería").
+  Destino del botón principal del hero y del enlace "Producto" del menú.
   Pendiente de fotografía del cliente: reemplazar los .frame por <Image>.
 -->
-<section id="galeria" class="gallery" aria-labelledby="gallery-title">
+<section id="producto" class="product" aria-labelledby="product-title">
   <div class="container">
-    <SectionTitle id="gallery-title">Galería</SectionTitle>
+    <SectionTitle id="product-title">{t.product.title}</SectionTitle>
 
     <div class="grid" aria-hidden="true">
-      <div class="frame">Fotografía</div>
-      <div class="frame">Fotografía</div>
-      <div class="frame">Fotografía</div>
+      <div class="frame">{t.product.photo}</div>
+      <div class="frame">{t.product.photo}</div>
+      <div class="frame">{t.product.photo}</div>
     </div>
   </div>
 </section>
 
 <style>
-  .gallery {
+  .product {
     padding-block: var(--space-16);
     scroll-margin-block-start: var(--space-16);
   }
@@ -42,7 +45,7 @@ import SectionTitle from '../../shared/components/SectionTitle.astro';
   }
 
   @media (width >= 48rem) {
-    .gallery {
+    .product {
       padding-block: var(--space-32);
     }
 

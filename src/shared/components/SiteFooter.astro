@@ -1,14 +1,16 @@
 ---
-import { withBase } from '../url';
+import { getLocale, href, useTranslations } from '../../i18n';
 import Logo from './Logo.astro';
 
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
 const year = new Date().getFullYear();
 
 const sitemap = [
-  { label: 'Inicio', href: withBase() },
-  { label: 'Galería', href: withBase('#galeria') },
-  { label: 'Nosotros', href: withBase('#nosotros') },
-  { label: 'Sucursales', href: withBase('sucursales/') },
+  { label: t.footer.home, href: href('home', locale) },
+  { label: t.nav.product, href: href('home', locale, '#producto') },
+  { label: t.nav.about, href: href('home', locale, '#nosotros') },
+  { label: t.nav.branches, href: href('branches', locale) },
 ];
 
 /**
@@ -18,8 +20,8 @@ const sitemap = [
 const social: { label: string; href: string }[] = [];
 
 const legal = [
-  { label: 'Aviso de privacidad', href: withBase('privacidad/') },
-  { label: 'Cookies', href: withBase('cookies/') },
+  { label: t.footer.privacy, href: href('privacy', locale) },
+  { label: t.footer.cookies, href: href('cookies', locale) },
 ];
 ---
 
@@ -27,7 +29,7 @@ const legal = [
   <div class="container inner">
     <div class="main">
       <nav class="sitemap" aria-labelledby="footer-sitemap">
-        <h2 id="footer-sitemap">Mapa del sitio</h2>
+        <h2 id="footer-sitemap">{t.footer.sitemap}</h2>
         <ul>
           {sitemap.map((item) => (
             <li>
@@ -43,7 +45,7 @@ const legal = [
 
       <div class="connect">
         <section aria-labelledby="footer-social">
-          <h2 id="footer-social">Redes sociales</h2>
+          <h2 id="footer-social">{t.footer.social}</h2>
           {social.length > 0 ? (
             <ul>
               {social.map((item) => (
@@ -55,15 +57,15 @@ const legal = [
               ))}
             </ul>
           ) : (
-            <p class="pending">Muy pronto.</p>
+            <p class="pending">{t.footer.comingSoon}</p>
           )}
         </section>
 
         <section aria-labelledby="footer-branches">
-          <h2 id="footer-branches">Sucursales</h2>
+          <h2 id="footer-branches">{t.footer.branches}</h2>
           <ul>
             <li>
-              <a href={withBase('sucursales/')}>Ver ubicaciones</a>
+              <a href={href('branches', locale)}>{t.footer.viewLocations}</a>
             </li>
           </ul>
         </section>
@@ -72,10 +74,10 @@ const legal = [
 
     <div class="bottom">
       <p class="copyright">
-        © {year} Soul Matcha. Todos los derechos reservados.
+        © {year} {t.site.name}. {t.footer.rights}
       </p>
 
-      <nav aria-label="Legal">
+      <nav aria-label={t.footer.legalNav}>
         <ul class="legal">
           {legal.map((item) => (
             <li>

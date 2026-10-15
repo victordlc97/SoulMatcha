@@ -1,12 +1,13 @@
 ---
 import LegalLayout from '../layouts/LegalLayout.astro';
-import { withBase } from '../shared/url';
+import { href } from '../i18n';
 ---
 
 <LegalLayout
   title="Aviso de privacidad"
   description="Cómo trata Soul Matcha la información de quienes visitan este sitio."
   updated="15 de octubre de 2026"
+  routeKey="privacy"
 >
   <h2>Resumen</h2>
   <p>
@@ -50,7 +51,7 @@ import { withBase } from '../shared/url';
   <p>
     El sitio guarda en tu navegador unos pocos datos técnicos para funcionar. No
     contienen información personal. Consulta el detalle en la{' '}
-    <a href={withBase('cookies/')}>página de cookies</a>.
+    <a href={href('cookies', 'es')}>página de cookies</a>.
   </p>
 
   <h2>Enlaces a otros sitios</h2>

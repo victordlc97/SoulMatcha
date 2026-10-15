@@ -1,0 +1,31 @@
+---
+import { Picture } from 'astro:assets';
+import { getLocale, useTranslations } from '../../i18n';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import heroImage from '../hero/hero.jpg';
+import Hero from '../hero/Hero.astro';
+import ProductSection from '../products/ProductSection.astro';
+import AboutSection from '../story/AboutSection.astro';
+
+/** Portada. La usan `/` (español) y `/en/` (inglés): el idioma lo resuelve Astro por la URL. */
+const t = useTranslations(getLocale(Astro));
+---
+
+<BaseLayout title={t.site.name} routeKey="home">
+  <Hero>
+    <!-- Decorativa (alt vacío): el h1 del Hero ya nombra la sección. Es el LCP, por eso eager + fetchpriority. -->
+    <Picture
+      slot="media"
+      src={heroImage}
+      alt=""
+      formats={['avif', 'webp']}
+      widths={[800, 1200, 1600, 2400, 3200]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+    />
+  </Hero>
+  <!-- Mismo orden que el menú: Producto, Nosotros. -->
+  <ProductSection />
+  <AboutSection />
+</BaseLayout>

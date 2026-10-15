@@ -1,7 +1,10 @@
 ---
+import { getLocale, href, useTranslations } from '../../i18n';
 import Button from '../../shared/components/Button.astro';
 import SectionTitle from '../../shared/components/SectionTitle.astro';
-import { withBase } from '../../shared/url';
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
 
 /*
  * Hero a pantalla completa.
@@ -20,17 +23,22 @@ import { withBase } from '../../shared/url';
 
   <div class="container content">
     <div class="title">
-      <SectionTitle id="hero-title" level="h1" size="display" accent="matcha">
-        Life is better with
+      <SectionTitle
+        id="hero-title"
+        level="h1"
+        size="display"
+        accent={t.hero.titleAccent}
+      >
+        {t.hero.titleLead}
       </SectionTitle>
     </div>
 
     <div class="actions">
-      <Button href={withBase('#galeria')} variant="rose" size="sm">
-        Conoce Soul Matcha
+      <Button href={href('home', locale, '#producto')} variant="rose" size="sm">
+        {t.hero.ctaPrimary}
       </Button>
-      <Button href={withBase('sucursales/')} variant="secondary" size="sm">
-        Ver sucursales
+      <Button href={href('branches', locale)} variant="secondary" size="sm">
+        {t.hero.ctaSecondary}
       </Button>
     </div>
   </div>
@@ -67,9 +75,9 @@ import { withBase } from '../../shared/url';
     block-size: 100%;
     object-fit: cover;
 
-    /* Punto de interés (la lata) casi al centro (50 % en x, 55 % en y): en pantallas anchas deja
-       una franja de follaje oscuro abajo para el texto, y sigue visible en cualquier proporción. */
-    object-position: 50% 55%;
+    /* Punto de interés (la lata) al centro de la foto (50 % en x e y): sigue visible en cualquier
+       proporción de pantalla y es el origen del zoom. */
+    object-position: 50% 50%;
   }
 
   /* Degradados de legibilidad: uno vertical y otro localizado en la esquina del texto (no toca la lata).

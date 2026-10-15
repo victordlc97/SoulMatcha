@@ -1,20 +1,40 @@
 ---
-import { withBase } from '../url';
+import {
+  alternateLocale,
+  getLocale,
+  href,
+  localeInfo,
+  useTranslations,
+  type RouteKey,
+} from '../../i18n';
 import Logo from './Logo.astro';
 
+interface Props {
+  /** Página actual: permite que el selector de idioma lleve a la MISMA página en el otro idioma. */
+  routeKey?: RouteKey;
+}
+
+const { routeKey = 'home' } = Astro.props;
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+
 const links = [
-  { label: 'Galería', href: withBase('#galeria') },
-  { label: 'Nosotros', href: withBase('#nosotros') },
-  { label: 'Sucursales', href: withBase('sucursales/') },
+  { label: t.nav.product, href: href('home', locale, '#producto') },
+  { label: t.nav.about, href: href('home', locale, '#nosotros') },
+  { label: t.nav.branches, href: href('branches', locale) },
 ];
 
-// Escritorio: dos enlaces a la izquierda del logo y uno a la derecha.
+// Escritorio: dos enlaces a la izquierda del logo; a la derecha, el tercero y el selector de idioma.
 const start = links.slice(0, 2);
 const end = links.slice(2);
+
+const other = alternateLocale(locale);
+const switchHref = href(routeKey, other);
+const switchInfo = localeInfo[other];
 ---
 
 <header class="site-header">
-  <nav class="bar" aria-label="Principal">
+  <nav class="bar" aria-label={t.a11y.mainNav}>
     <ul class="links start">
       {start.map((link) => (
         <li>
@@ -23,7 +43,7 @@ const end = links.slice(2);
       ))}
     </ul>
 
-    <a class="brand" href={withBase()} aria-label="Soul Matcha, ir al inicio">
+    <a class="brand" href={href('home', locale)} aria-label={t.a11y.goHome}>
       <Logo size="header" />
     </a>
 
@@ -33,6 +53,17 @@ const end = links.slice(2);
           <a href={link.href}>{link.label}</a>
         </li>
       ))}
+      <li>
+        <a
+          class="lang"
+          href={switchHref}
+          lang={other}
+          hreflang={other}
+          aria-label={switchInfo.ariaLabel}
+        >
+          {switchInfo.short}
+        </a>
+      </li>
     </ul>
 
     <!-- Solo móvil: abre el panel lateral. En escritorio los enlaces van en la barra. -->
@@ -40,7 +71,7 @@ const end = links.slice(2);
       type="button"
       class="menu-toggle"
       data-menu-toggle
-      aria-label="Abrir menú"
+      aria-label={t.a11y.openMenu}
       aria-haspopup="dialog"
       aria-controls="site-menu"
       aria-expanded="false"
@@ -62,12 +93,12 @@ const end = links.slice(2);
   PANEL LATERAL (móvil). <dialog> modal nativo: atrapa el foco, cierra con Esc y deja el resto
   de la página inerte. Vive fuera de .site-header para no heredar su estado claro/oscuro.
 -->
-<dialog class="menu" id="site-menu" data-menu aria-label="Menú principal">
+<dialog class="menu" id="site-menu" data-menu aria-label={t.a11y.menuDialog}>
   <div class="menu-top">
     <a
       class="menu-brand"
-      href={withBase()}
-      aria-label="Soul Matcha, ir al inicio"
+      href={href('home', locale)}
+      aria-label={t.a11y.goHome}
     >
       <Logo size="drawer" />
     </a>
@@ -76,7 +107,7 @@ const end = links.slice(2);
       type="button"
       class="menu-close"
       data-menu-close
-      aria-label="Cerrar menú"
+      aria-label={t.a11y.closeMenu}
     >
       <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
         <path
@@ -90,7 +121,7 @@ const end = links.slice(2);
     </button>
   </div>
 
-  <nav aria-label="Menú">
+  <nav aria-label={t.a11y.menuNav}>
     <ul class="menu-links">
       {links.map((link) => (
         <li>
@@ -99,6 +130,17 @@ const end = links.slice(2);
           </a>
         </li>
       ))}
+      <li>
+        <a
+          class="menu-link menu-lang"
+          href={switchHref}
+          lang={other}
+          hreflang={other}
+          aria-label={switchInfo.ariaLabel}
+        >
+          {switchInfo.name}
+        </a>
+      </li>
     </ul>
   </nav>
 </dialog>
@@ -364,6 +406,15 @@ const end = links.slice(2);
 
   .menu-link:hover {
     color: var(--text-link);
+  }
+
+  /* Selector de idioma: más discreto que un enlace de navegación (es otra clase de acción). */
+  .lang {
+    letter-spacing: var(--tracking-caps);
+  }
+
+  .menu-lang {
+    color: var(--text-secondary);
   }
 </style>
 

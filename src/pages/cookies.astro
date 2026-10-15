@@ -1,12 +1,15 @@
 ---
+import { getLocale, href, useTranslations } from '../i18n';
 import LegalLayout from '../layouts/LegalLayout.astro';
-import { withBase } from '../shared/url';
+
+const t = useTranslations(getLocale(Astro));
 ---
 
 <LegalLayout
   title="Cookies"
   description="Qué almacena Soul Matcha en tu navegador y cómo cambiar tu elección."
   updated="15 de octubre de 2026"
+  routeKey="cookies"
 >
   <h2>Resumen</h2>
   <p>
@@ -37,11 +40,19 @@ import { withBase } from '../shared/url';
 
   <h2>Tu elección</h2>
   <p>
-    Elección actual: <strong data-consent-status>Sin elegir</strong>
+    {t.consent.current}{' '}
+    <strong
+      data-consent-status
+      data-label-accepted={t.consent.accept}
+      data-label-essential={t.consent.essential}
+      data-label-none={t.consent.notChosen}
+    >
+      {t.consent.notChosen}
+    </strong>
   </p>
   <p>
     <button type="button" class="reset" data-consent-reset>
-      Cambiar mi elección
+      {t.consent.change}
     </button>
   </p>
 
@@ -49,7 +60,7 @@ import { withBase } from '../shared/url';
   <p>
     Desde la configuración de tu navegador puedes borrar los datos de este sitio
     en cualquier momento. Más información sobre el tratamiento de datos en el{' '}
-    <a href={withBase('privacidad/')}>aviso de privacidad</a>.
+    <a href={href('privacy', 'es')}>aviso de privacidad</a>.
   </p>
 </LegalLayout>
 
@@ -69,21 +80,7 @@ import { withBase } from '../shared/url';
 </style>
 
 <script>
-  import { readConsent } from '../shared/consent';
+  import { initConsentStatus } from '../shared/consent-status';
 
-  const labels = { accepted: 'Aceptar', essential: 'Solo necesarias' } as const;
-  const status = document.querySelector('[data-consent-status]');
-
-  const render = () => {
-    const choice = readConsent();
-    if (status) status.textContent = choice ? labels[choice] : 'Sin elegir';
-  };
-
-  render();
-  document.addEventListener('sm:consent-change', render);
-  document
-    .querySelector('[data-consent-reset]')
-    ?.addEventListener('click', () =>
-      document.dispatchEvent(new CustomEvent('sm:consent-reset')),
-    );
+  initConsentStatus();
 </script>

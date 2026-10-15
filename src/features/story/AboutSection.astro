@@ -1,5 +1,8 @@
 ---
+import { getLocale, useTranslations } from '../../i18n';
 import SectionTitle from '../../shared/components/SectionTitle.astro';
+
+const t = useTranslations(getLocale(Astro));
 ---
 
 <!--
@@ -11,15 +14,15 @@ import SectionTitle from '../../shared/components/SectionTitle.astro';
 <section id="nosotros" class="about" aria-labelledby="about-title">
   <div class="container grid">
     <div class="copy">
-      <SectionTitle id="about-title">Nosotros</SectionTitle>
-      <p class="pending">Texto de marca pendiente de contenido del cliente.</p>
+      <SectionTitle id="about-title">{t.about.title}</SectionTitle>
+      <p class="pending">{t.about.pending}</p>
     </div>
 
     <div class="frame tall" aria-hidden="true">
-      Fotografía
+      {t.about.photo}
     </div>
     <div class="frame square" aria-hidden="true">
-      Fotografía
+      {t.about.photo}
     </div>
   </div>
 </section>

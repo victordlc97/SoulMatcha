@@ -1,5 +1,8 @@
 ---
-import { withBase } from '../url';
+import { getLocale, href, useTranslations } from '../../i18n';
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
 ---
 
 <!--
@@ -12,21 +15,20 @@ import { withBase } from '../url';
 <div
   class="consent"
   role="region"
-  aria-label="Preferencias de cookies"
+  aria-label={t.consent.region}
   data-consent-banner
   hidden
 >
   <p class="text">
-    Solo usamos almacenamiento técnico para recordar tus preferencias. No
-    rastreamos tu visita. <a href={withBase('cookies/')}>Más información</a>
+    {t.consent.text} <a href={href('cookies', locale)}>{t.consent.more}</a>
   </p>
 
   <div class="actions">
     <button type="button" class="accept" data-consent="accepted">
-      Aceptar
+      {t.consent.accept}
     </button>
     <button type="button" class="essential" data-consent="essential">
-      Solo necesarias
+      {t.consent.essential}
     </button>
   </div>
 </div>

@@ -1,5 +1,12 @@
 ---
 import '../styles/global.css';
+import {
+  getLocale,
+  locales,
+  routePath,
+  useTranslations,
+  type RouteKey,
+} from '../i18n';
 import CookieBanner from '../shared/components/CookieBanner.astro';
 import Loader from '../shared/components/Loader.astro';
 import SiteFooter from '../shared/components/SiteFooter.astro';
@@ -10,25 +17,46 @@ interface Props {
   title: string;
   description?: string;
   noindex?: boolean;
+  /** Página actual. Con ella se generan los `hreflang` y el selector de idioma apunta a la misma página. */
+  routeKey?: RouteKey;
 }
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
 
 const {
   title,
-  description = 'Soul Matcha: matcha premium con elegancia y lujo.',
+  description = t.site.description,
   noindex = false,
+  routeKey,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
+
+// Versiones de esta página en cada idioma (para buscadores). `x-default` = español.
+const alternates = routeKey
+  ? locales.map((l) => ({
+      locale: l,
+      url: new URL(withBase(routePath(routeKey, l)), Astro.site),
+    }))
+  : [];
+const xDefault = alternates.find((a) => a.locale === 'es');
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {alternates.map((a) => (
+      <link rel="alternate" hreflang={a.locale} href={a.url} />
+    ))}
+    {xDefault && (
+      <link rel="alternate" hreflang="x-default" href={xDefault.url} />
+    )}
     <link rel="icon" href={withBase('favicon.ico')} sizes="32x32" />
     <link
       rel="icon"
@@ -41,6 +69,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={locale} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <!-- Antes del primer pintado: si el loader ya se mostró en esta sesión, no lo muestres de nuevo. -->
     <script is:inline>
@@ -63,9 +92,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   <body>
     <Loader />
     <a class="skip-link" href="#contenido">
-      Ir al contenido
+      {t.a11y.skipToContent}
     </a>
-    <SiteHeader />
+    <SiteHeader routeKey={routeKey} />
     <main id="contenido">
       <slot />
     </main>

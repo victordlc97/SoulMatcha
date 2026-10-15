@@ -1,0 +1,74 @@
+---
+import { href } from '../../i18n';
+import LegalLayout from '../../layouts/LegalLayout.astro';
+---
+
+<LegalLayout
+  title="Privacy notice"
+  description="How Soul Matcha handles the information of people who visit this site."
+  updated="October 15, 2026"
+  routeKey="privacy"
+>
+  <h2>Summary</h2>
+  <p>
+    This site is informational. We do not collect personal data: there are no
+    forms, user accounts, purchases or comments.
+  </p>
+
+  <h2>What we do not do</h2>
+  <ul>
+    <li>We do not use analytics or measurement tools.</li>
+    <li>We do not use advertising or tracking pixels.</li>
+    <li>
+      We do not embed third-party content, such as maps, videos or social media
+      buttons.
+    </li>
+    <li>
+      We do not load resources from other domains: fonts and images are served
+      from this same site.
+    </li>
+  </ul>
+
+  <h2>Technical data from hosting</h2>
+  <p>
+    This site is hosted on GitHub Pages. As with any web server, the host may
+    log technical data about each visit (for example, the IP address, browser
+    and date) for security and operational purposes. We do not access or use
+    those logs. To see how they are handled, read the host's{' '}
+    <a
+      href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      GitHub privacy statement
+    </a>
+    .
+  </p>
+  <p>If we change hosting provider, we will update this notice.</p>
+
+  <h2>Storage in your browser</h2>
+  <p>
+    The site stores a few technical items in your browser in order to work. They
+    contain no personal information. See the details on the{' '}
+    <a href={href('cookies', 'en')}>cookies page</a>.
+  </p>
+
+  <h2>Links to other sites</h2>
+  <p>
+    When we add links to social media or other sites, those will have their own
+    privacy policies, separate from this notice.
+  </p>
+
+  <h2>Changes to this notice</h2>
+  <p>
+    If the site starts to collect data (for example, with a contact form or
+    analytics), we will update this notice beforehand and, where applicable, ask
+    for your consent.
+  </p>
+
+  <h2>Controller and contact</h2>
+  <p class="pending">
+    Pending: name or legal entity of the controller and a contact method (for
+    example, an email address).
+  </p>
+</LegalLayout>

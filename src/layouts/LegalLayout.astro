@@ -1,26 +1,36 @@
 ---
+import { getLocale, useTranslations, type RouteKey } from '../i18n';
 import SectionTitle from '../shared/components/SectionTitle.astro';
 import BaseLayout from './BaseLayout.astro';
 
 interface Props {
   title: string;
   description: string;
-  /** Fecha de la última revisión del texto, en lenguaje natural. */
+  /** Fecha de la última revisión del texto, en lenguaje natural y en el idioma de la página. */
   updated: string;
+  /** Página legal (para el selector de idioma y los hreflang). */
+  routeKey: RouteKey;
 }
 
-const { title, description, updated } = Astro.props;
+const { title, description, updated, routeKey } = Astro.props;
+const t = useTranslations(getLocale(Astro));
 ---
 
 <!--
   Plantilla de páginas legales: texto largo, columna angosta, sin adornos.
   El cuerpo va en el slot, con h2/p/ul normales: aquí se les da estilo.
 -->
-<BaseLayout title={`${title} | Soul Matcha`} description={description}>
+<BaseLayout
+  title={`${title} | ${t.site.name}`}
+  description={description}
+  routeKey={routeKey}
+>
   <article class="legal">
     <div class="container">
       <SectionTitle level="h1">{title}</SectionTitle>
-      <p class="updated">Última actualización: {updated}</p>
+      <p class="updated">
+        {t.legal.updated} {updated}
+      </p>
 
       <div class="body">
         <slot />

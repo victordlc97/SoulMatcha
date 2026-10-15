@@ -46,7 +46,7 @@ test('el header flota con vidrio y reparte la navegación a ambos lados del logo
 }) => {
   await page.goto('./');
   const nav = page.getByRole('navigation', { name: 'Principal' });
-  await expect(nav.getByRole('link', { name: 'Galería' })).toBeVisible();
+  await expect(nav.getByRole('link', { name: 'Producto' })).toBeVisible();
   await expect(nav.getByRole('link', { name: 'Nosotros' })).toBeVisible();
   await expect(nav.getByRole('link', { name: 'Sucursales' })).toBeVisible();
 
@@ -70,7 +70,7 @@ test('el header usa cristal oscuro sobre el hero y claro sobre crema y sobre el 
   const header = page.locator('.site-header');
   const link = page
     .getByRole('navigation', { name: 'Principal' })
-    .getByRole('link', { name: 'Galería' });
+    .getByRole('link', { name: 'Producto' });
 
   // Sobre el hero (foto oscura): texto crema.
   await expect(header).toHaveAttribute('data-surface', 'dark');
@@ -171,7 +171,7 @@ test('los dos botones del hero llevan a la galería (rosa) y a la página de suc
   const hero = page.locator('section.hero');
   await expect(
     hero.getByRole('link', { name: 'Conoce Soul Matcha' }),
-  ).toHaveAttribute('href', '/SoulMatcha/#galeria');
+  ).toHaveAttribute('href', '/SoulMatcha/#producto');
   await hero.getByRole('link', { name: 'Ver sucursales' }).click();
   await expect(page).toHaveURL(/\/sucursales\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
@@ -304,7 +304,7 @@ test('en móvil el menú es un panel lateral que se abre, se cierra con Esc y na
   await toggle.click();
   await expect(menu).toBeVisible();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-  for (const name of ['Galería', 'Nosotros', 'Sucursales']) {
+  for (const name of ['Producto', 'Nosotros', 'Sucursales']) {
     await expect(menu.getByRole('link', { name })).toBeVisible();
   }
 
@@ -319,4 +319,98 @@ test('en móvil el menú es un panel lateral que se abre, se cierra con Esc y na
   await menu.getByRole('link', { name: 'Sucursales' }).click();
   await expect(page).toHaveURL(/\/sucursales\/$/);
   await expect(menu).toBeHidden();
+});
+
+test.describe('versión en inglés', () => {
+  test('la portada en inglés declara el idioma, traduce la interfaz y enlaza a la versión en español', async ({
+    page,
+  }) => {
+    await page.goto('./en/');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'Life is better with',
+    );
+
+    const nav = page.getByRole('navigation', { name: 'Main' });
+    for (const name of ['Product', 'About us', 'Locations']) {
+      await expect(nav.getByRole('link', { name })).toBeVisible();
+    }
+
+    const hero = page.locator('section.hero');
+    await expect(
+      hero.getByRole('link', { name: 'Discover Soul Matcha' }),
+    ).toHaveAttribute('href', '/SoulMatcha/en/#producto');
+    await expect(
+      hero.getByRole('link', { name: 'See locations' }),
+    ).toHaveAttribute('href', '/SoulMatcha/en/branches/');
+
+    // Buscadores: cada versión apunta a la otra.
+    const alternates = await page
+      .locator('link[rel="alternate"]')
+      .evaluateAll((els) =>
+        els.map(
+          (e) => `${e.getAttribute('hreflang')} ${e.getAttribute('href')}`,
+        ),
+      );
+    expect(alternates).toEqual([
+      'es https://victordlc97.github.io/SoulMatcha/',
+      'en https://victordlc97.github.io/SoulMatcha/en/',
+      'x-default https://victordlc97.github.io/SoulMatcha/',
+    ]);
+  });
+
+  test('el selector de idioma lleva a la MISMA página en el otro idioma, en ambos sentidos', async ({
+    page,
+  }) => {
+    await page.goto('./sucursales/');
+    await page
+      .getByRole('navigation', { name: 'Principal' })
+      .getByRole('link', { name: 'Read this site in English' })
+      .click();
+    await expect(page).toHaveURL(/\/en\/branches\/$/);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'Locations',
+    );
+
+    await page
+      .getByRole('navigation', { name: 'Main' })
+      .getByRole('link', { name: 'Ver el sitio en español' })
+      .click();
+    await expect(page).toHaveURL(/\/sucursales\/$/);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'Sucursales',
+    );
+  });
+
+  test('las páginas legales y el aviso de cookies existen en inglés', async ({
+    page,
+  }) => {
+    await page.goto('./en/privacy/');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'Privacy notice',
+    );
+
+    await page.goto('./en/cookies/');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cookies');
+    const banner = page.getByRole('region', { name: 'Cookie preferences' });
+    await expect(banner).toBeVisible();
+    await banner.getByRole('button', { name: 'Accept' }).click();
+    await expect(banner).toBeHidden();
+    await expect(page.locator('[data-consent-status]')).toHaveText('Accept');
+  });
+
+  test('el footer en inglés está traducido y enlaza a las páginas legales en inglés', async ({
+    page,
+  }) => {
+    await page.goto('./en/');
+    const footer = page.getByRole('contentinfo');
+    await expect(
+      footer.getByRole('navigation', { name: 'Sitemap' }),
+    ).toBeVisible();
+    await expect(footer.getByText('All rights reserved.')).toBeVisible();
+    await expect(
+      footer.getByRole('link', { name: 'Privacy notice' }),
+    ).toHaveAttribute('href', '/SoulMatcha/en/privacy/');
+  });
 });

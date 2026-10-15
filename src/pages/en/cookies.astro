@@ -1,0 +1,85 @@
+---
+import { getLocale, href, useTranslations } from '../../i18n';
+import LegalLayout from '../../layouts/LegalLayout.astro';
+
+const t = useTranslations(getLocale(Astro));
+---
+
+<LegalLayout
+  title="Cookies"
+  description="What Soul Matcha stores in your browser and how to change your choice."
+  updated="October 15, 2026"
+  routeKey="cookies"
+>
+  <h2>Summary</h2>
+  <p>
+    This site does not use cookies. It does use browser storage (sessionStorage
+    and localStorage) for two technical functions. That data is not shared with
+    third parties and is not used to track you.
+  </p>
+
+  <h2>What we store</h2>
+  <ul>
+    <li>
+      <code>sm-loader-seen</code> (session storage): remembers that you have
+      already seen the loading screen so it is not shown again. It is deleted
+      when you close the tab.
+    </li>
+    <li>
+      <code>sm-cookie-consent</code> (local storage): saves your choice about
+      this notice. It stays until you change it or clear the site's data.
+    </li>
+  </ul>
+
+  <h2>Third-party cookies and analytics</h2>
+  <p>
+    None. If we add measurement or advertising tools in the future, they will
+    only be enabled if you accept, and we will update this page.
+  </p>
+
+  <h2>Your choice</h2>
+  <p>
+    {t.consent.current}{' '}
+    <strong
+      data-consent-status
+      data-label-accepted={t.consent.accept}
+      data-label-essential={t.consent.essential}
+      data-label-none={t.consent.notChosen}
+    >
+      {t.consent.notChosen}
+    </strong>
+  </p>
+  <p>
+    <button type="button" class="reset" data-consent-reset>
+      {t.consent.change}
+    </button>
+  </p>
+
+  <h2>How to delete this data</h2>
+  <p>
+    From your browser settings you can delete this site's data at any time. More
+    information about how data is handled in the{' '}
+    <a href={href('privacy', 'en')}>privacy notice</a>.
+  </p>
+</LegalLayout>
+
+<style>
+  .reset {
+    min-block-size: var(--button-height-sm);
+    padding-inline: var(--space-6);
+    border: 2px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--surface-footer);
+    color: var(--text-on-rose);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  import { initConsentStatus } from '../../shared/consent-status';
+
+  initConsentStatus();
+</script>
