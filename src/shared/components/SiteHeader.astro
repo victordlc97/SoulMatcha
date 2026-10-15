@@ -115,10 +115,17 @@ import Logo from './Logo.astro';
     background: var(--hover-tint);
   }
 
-  /* Sobre el footer oscuro: cristal oscuro con texto crema (ver motion/header-surface.ts). */
+  /* Sobre superficies oscuras o de tono medio (hero, footer): cristal oscuro con texto crema.
+     Oscurece lo que hay detrás (brightness < 1): un tinte solo no basta, porque el desenfoque
+     promedia la foto a un tono medio donde ningún color de texto cumple contraste.
+     Ver motion/header-surface.ts. */
   .site-header[data-surface='dark'] .bar {
     border-color: var(--glass-border-dark);
     background: var(--glass-bg-dark);
+
+    /* stylelint-disable-next-line property-no-vendor-prefix -- Safari < 18 */
+    -webkit-backdrop-filter: var(--glass-blur-dark);
+    backdrop-filter: var(--glass-blur-dark);
   }
 
   .site-header[data-surface='dark'] .links a {

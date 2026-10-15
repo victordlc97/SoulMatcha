@@ -50,19 +50,28 @@
     var(--color-spanish-white)
   );
 
-  /* Vidrio esmerilado.
-     Versión anterior (opaca, por si hay que volver): bg 82 %, blur(20px) saturate(180%).
-     Descartado: brightness(2) cumplía AA pero dejaba el cristal lechoso y el dorado amarillo limón.
-     Medido sobre píxeles reales (texto café, franja sin texto): 55 % → 4.2–4.4 (bajo AA);
-     62 % → escritorio ≥ 4.6 en todo el hero, móvil mínimo 4.3 en un punto del scroll.
-     Sobre superficies oscuras (el footer) el header cambia a la variante `dark`
-     (texto crema, 5.4–6.4). Revalidar si cambia la foto del hero. */
+  /* Vidrio esmerilado: dos variantes. El header elige según lo que tiene detrás
+     (header-surface.ts; secciones con data-header-surface="dark": hero y footer).
+
+     CLARO (sobre el lienzo crema), texto café: ≥ 6.9:1.
+     OSCURO (sobre hero/footer), texto crema: ≥ 5.1:1. Oscurece lo que hay detrás con
+     brightness < 1 porque un tinte solo no basta: el desenfoque promedia una foto a un
+     tono medio donde ningún color de texto cumple contraste.
+     Medido en píxeles reales (zonas sin texto) cada 60 px de scroll, a 375/768/1440/1920.
+
+     Historial, por si hay que volver:
+     - v1 opaca: bg crema 82 %, blur(20px) saturate(180%), un solo cristal claro.
+     - v2: crema 55 % → 4.2–4.4:1 con la foto rosa; 62 % pasaba, pero con la foto verde
+       (hero2) caía a 2.9–4.6:1 y brightness > 1 casi no ayudaba sobre tonos oscuros.
+     - brightness(2) cumplía AA pero dejaba el cristal lechoso y el dorado amarillo limón.
+     Revalidar si cambia la foto del hero. */
   --glass-bg: color-mix(in srgb, var(--color-cream) 62%, transparent);
-  --glass-bg-dark: color-mix(in srgb, var(--color-west-coast) 55%, transparent);
-  --glass-border-dark: color-mix(in srgb, var(--color-cream) 25%, transparent);
-  --hover-tint-dark: color-mix(in srgb, var(--color-cream) 14%, transparent);
   --glass-border: color-mix(in srgb, var(--color-white) 55%, transparent);
   --glass-blur: blur(20px) saturate(150%) brightness(1.15);
+  --glass-bg-dark: color-mix(in srgb, var(--color-west-coast) 10%, transparent);
+  --glass-border-dark: color-mix(in srgb, var(--color-cream) 25%, transparent);
+  --glass-blur-dark: blur(20px) saturate(150%) brightness(0.42);
+  --hover-tint-dark: color-mix(in srgb, var(--color-cream) 14%, transparent);
   --shadow-float:
     0 1px 1px color-mix(in srgb, var(--color-west-coast) 8%, transparent),
     0 12px 32px color-mix(in srgb, var(--color-west-coast) 18%, transparent);

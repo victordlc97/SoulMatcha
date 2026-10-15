@@ -1,7 +1,8 @@
 /**
- * El header de cristal es claro (texto café). Sobre el footer oscuro ese texto
- * deja de cumplir contraste, así que mientras el footer toca la barra el header
- * cambia a su variante oscura (`data-surface="dark"`).
+ * El header de cristal es claro (texto café). Sobre una foto oscura o el footer ese
+ * texto deja de cumplir contraste, así que mientras una sección marcada con
+ * `data-header-surface="dark"` (hero, footer) toca la barra, el header cambia a su
+ * variante oscura (`data-surface="dark"`, texto crema).
  */
 
 /**
@@ -20,16 +21,31 @@ export function surfaceRootMargin(
 export function initHeaderSurface(): void {
   const header = document.querySelector<HTMLElement>('.site-header');
   const bar = header?.querySelector<HTMLElement>('.bar');
-  const footer = document.querySelector<HTMLElement>('.site-footer');
-  if (!header || !bar || !footer || !('IntersectionObserver' in window)) return;
+  // Cualquier sección que declare `data-header-surface="dark"` (hero, footer).
+  const darkSections = document.querySelectorAll<HTMLElement>(
+    '[data-header-surface="dark"]',
+  );
+  if (
+    !header ||
+    !bar ||
+    darkSections.length === 0 ||
+    !('IntersectionObserver' in window)
+  )
+    return;
 
   let observer: IntersectionObserver | undefined;
+  const touching = new Set<Element>();
 
   const observe = () => {
     observer?.disconnect();
+    touching.clear();
     observer = new IntersectionObserver(
-      ([entry]) => {
-        header.dataset.surface = entry.isIntersecting ? 'dark' : 'light';
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) touching.add(entry.target);
+          else touching.delete(entry.target);
+        }
+        header.dataset.surface = touching.size > 0 ? 'dark' : 'light';
       },
       {
         rootMargin: surfaceRootMargin(
@@ -38,7 +54,7 @@ export function initHeaderSurface(): void {
         ),
       },
     );
-    observer.observe(footer);
+    darkSections.forEach((section) => observer!.observe(section));
   };
 
   observe();

@@ -7,7 +7,7 @@
  */
 ---
 
-<section class="hero" aria-labelledby="hero-title">
+<section class="hero" aria-labelledby="hero-title" data-header-surface="dark">
   <div class="media" aria-hidden="true">
     <slot name="media">
       <div class="placeholder"></div>
@@ -43,6 +43,10 @@
     inline-size: 100%;
     block-size: 100%;
     object-fit: cover;
+
+    /* Punto de interés (la lata) al centro de la foto: se mantiene visible en
+       cualquier proporción de pantalla y es el origen del zoom. */
+    object-position: 50% 50%;
   }
 
   /* Reserva visual mientras no hay foto: degradado de marca con luces suaves,

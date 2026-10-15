@@ -55,23 +55,30 @@ test('el header flota con vidrio y reparte la navegación a ambos lados del logo
   expect(hasBlur).toContain('blur');
 });
 
-test('el header pasa a cristal oscuro sobre el footer y vuelve a claro arriba', async ({
+test('el header usa cristal oscuro sobre hero y footer, y claro sobre el lienzo crema', async ({
   page,
 }) => {
   await page.goto('./');
   const header = page.locator('.site-header');
-  await expect(header).toHaveAttribute('data-surface', 'light');
+  const link = page
+    .getByRole('navigation', { name: 'Principal' })
+    .getByRole('link', { name: 'Galería' });
 
+  // Sobre el hero (foto oscura): texto crema.
+  await expect(header).toHaveAttribute('data-surface', 'dark');
+  await expect(link).toHaveCSS('color', 'rgb(240, 237, 229)');
+
+  // Sobre "Nosotros" (lienzo crema): texto café.
+  await page.evaluate(() =>
+    window.scrollTo(0, document.getElementById('nosotros')!.offsetTop + 200),
+  );
+  await expect(header).toHaveAttribute('data-surface', 'light');
+  await expect(link).toHaveCSS('color', 'rgb(88, 79, 50)');
+
+  // Sobre el footer: vuelve a oscuro.
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await expect(header).toHaveAttribute('data-surface', 'dark');
-  await expect(
-    page.getByRole('navigation', { name: 'Principal' }).getByRole('link', {
-      name: 'Galería',
-    }),
-  ).toHaveCSS('color', 'rgb(240, 237, 229)');
-
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await expect(header).toHaveAttribute('data-surface', 'light');
+  await expect(link).toHaveCSS('color', 'rgb(240, 237, 229)');
 });
 
 test('el hero ocupa la pantalla completa', async ({ page }) => {

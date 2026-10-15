@@ -38,3 +38,6 @@ public/fonts/*.ttf
 .agents/
 .claude/skills/
 skills-lock.json
+
+# Originales pesados de fotografía (la versión optimizada vive en src/)
+originales/
