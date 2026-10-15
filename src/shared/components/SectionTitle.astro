@@ -15,7 +15,12 @@ const { accent, level: Tag = 'h2', size = 'section', id } = Astro.props;
   <span class="caps">
     <slot />
   </span>
-  {accent && <span class="accent">{accent}</span>}
+  {accent && (
+    <>
+      {' '}
+      <span class="accent">{accent}</span>
+    </>
+  )}
 </Tag>
 
 <style>
@@ -25,7 +30,7 @@ const { accent, level: Tag = 'h2', size = 'section', id } = Astro.props;
   }
 
   .display {
-    font-size: clamp(var(--text-3xl), 4.2vw, var(--text-4xl));
+    font-size: var(--text-display);
   }
 
   .caps {

@@ -39,6 +39,9 @@
   /* Blanco por decisión de diseño (no compite con el logo blanco). Sobre el rosa da 1.9:1, bajo AA.
      Para volver a texto legible: var(--color-west-coast-ink), 5.25:1. */
   --text-on-footer: var(--color-white);
+  --text-on-rose: var(
+    --color-west-coast-ink
+  ); /* texto sobre botones rosa: 5.2:1 */
 
   /* Solo titulares grandes (3.87:1). */
   --text-accent-on-inverse: var(--color-gold);
@@ -79,6 +82,12 @@
   /* Tinte para oscurecer fotos bajo texto (degradado del hero): café casi negro, neutro. El café
      de marca solo ensucia el verde del follaje. */
   --scrim-ink: color-mix(in srgb, var(--color-west-coast) 30%, black);
+  --glass-bg-strong: color-mix(
+    in srgb,
+    var(--color-cream) 88%,
+    transparent
+  ); /* avisos sobre contenido variable: legible sobre cualquier fondo */
+
   --glass-border: color-mix(in srgb, var(--color-white) 55%, transparent);
   --glass-blur: blur(20px) saturate(150%) brightness(1.15);
   --glass-bg-dark: color-mix(in srgb, var(--color-west-coast) 10%, transparent);
@@ -114,6 +123,12 @@
   --text-3xl: 2.25rem; /* 36 px */
   --text-4xl: 3rem; /* 48 px */
   --text-5xl: 4rem; /* 64 px */
+  --text-display: clamp(
+    1.6rem,
+    3.2vw,
+    2.1rem
+  ); /* titular del hero: 26 px en móvil, 34 px en escritorio */
+
   --leading-tight: 1.15;
   --leading-heading: 1.25;
   --leading-body: 1.55;
@@ -140,11 +155,13 @@
   --radius-pill: 999px;
   --radius-lg: 1.5rem;
   --tap-target: 2.75rem; /* 44 px */
+  --button-height-sm: 2.5rem; /* 40 px: botones compactos (cumple el mínimo AA de 24 px) */
   --header-offset: var(
     --space-4
   ); /* separación de la barra flotante al borde */
 
   --z-header: 50;
+  --z-consent: 60;
   --z-loader: 200;
 
   /* ── Motion ──────────────────────────────────────── */

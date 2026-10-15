@@ -4,34 +4,29 @@ import Logo from './Logo.astro';
 
 const year = new Date().getFullYear();
 
-const legal = [
-  { label: 'Aviso de privacidad', href: withBase('privacidad/') },
-  { label: 'Cookies', href: withBase('cookies/') },
-];
-
 const sitemap = [
   { label: 'Inicio', href: withBase() },
   { label: 'Galería', href: withBase('#galeria') },
   { label: 'Nosotros', href: withBase('#nosotros') },
   { label: 'Sucursales', href: withBase('sucursales/') },
 ];
+
+/**
+ * Redes sociales. PENDIENTE: las cuentas reales (nombre y URL) las debe dar el cliente.
+ * Cada entrada: { label: 'Instagram', href: 'https://…' }. Mientras esté vacío se muestra un aviso.
+ */
+const social: { label: string; href: string }[] = [];
+
+const legal = [
+  { label: 'Aviso de privacidad', href: withBase('privacidad/') },
+  { label: 'Cookies', href: withBase('cookies/') },
+];
 ---
 
 <footer class="site-footer">
   <div class="container inner">
-    <div class="columns">
-      <nav aria-labelledby="footer-legal">
-        <h2 id="footer-legal">Legal</h2>
-        <ul>
-          {legal.map((item) => (
-            <li>
-              <a href={item.href}>{item.label}</a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      <nav aria-labelledby="footer-sitemap">
+    <div class="main">
+      <nav class="sitemap" aria-labelledby="footer-sitemap">
         <h2 id="footer-sitemap">Mapa del sitio</h2>
         <ul>
           {sitemap.map((item) => (
@@ -41,15 +36,55 @@ const sitemap = [
           ))}
         </ul>
       </nav>
+
+      <div class="wordmark">
+        <Logo size="footer" />
+      </div>
+
+      <div class="connect">
+        <section aria-labelledby="footer-social">
+          <h2 id="footer-social">Redes sociales</h2>
+          {social.length > 0 ? (
+            <ul>
+              {social.map((item) => (
+                <li>
+                  <a href={item.href} rel="noopener noreferrer" target="_blank">
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="pending">Muy pronto.</p>
+          )}
+        </section>
+
+        <section aria-labelledby="footer-branches">
+          <h2 id="footer-branches">Sucursales</h2>
+          <ul>
+            <li>
+              <a href={withBase('sucursales/')}>Ver ubicaciones</a>
+            </li>
+          </ul>
+        </section>
+      </div>
     </div>
 
-    <div class="wordmark">
-      <Logo size="footer" />
-    </div>
+    <div class="bottom">
+      <p class="copyright">
+        © {year} Soul Matcha. Todos los derechos reservados.
+      </p>
 
-    <p class="copyright">
-      © {year} Soul Matcha. Todos los derechos reservados.
-    </p>
+      <nav aria-label="Legal">
+        <ul class="legal">
+          {legal.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
   </div>
 </footer>
 
@@ -63,18 +98,37 @@ const sitemap = [
 
   .inner {
     display: grid;
-    gap: var(--space-16);
+    gap: var(--space-12);
     padding-block: var(--space-16) var(--space-8);
   }
 
-  .columns {
+  /* Móvil: logo arriba; mapa del sitio y redes/sucursales en dos columnas debajo. */
+  .main {
     display: grid;
+    grid-template-areas:
+      'logo logo'
+      'sitemap connect';
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  .wordmark {
+    grid-area: logo;
+  }
+
+  .sitemap {
+    grid-area: sitemap;
+  }
+
+  .connect {
+    display: grid;
+    grid-area: connect;
     gap: var(--space-8);
   }
 
   h2 {
-    margin-block-end: var(--space-4);
+    margin-block-end: var(--space-3);
     font-family: var(--font-body);
     font-size: var(--text-base);
     font-weight: var(--weight-bold);
@@ -103,22 +157,61 @@ const sitemap = [
     text-underline-offset: 0.25em;
   }
 
-  .copyright {
-    max-inline-size: none;
+  .pending {
+    color: var(--text-on-footer);
+    font-size: var(--text-sm);
+  }
+
+  /* Franja inferior: derechos reservados a la izquierda, avisos legales a la derecha. */
+  .bottom {
+    display: grid;
+    gap: var(--space-2);
     padding-block-start: var(--space-6);
     border-block-start: 1px solid
       color-mix(in srgb, var(--text-on-footer) 25%, transparent);
     font-size: var(--text-sm);
   }
 
-  @media (width >= 48rem) {
-    .columns {
-      grid-template-columns: repeat(2, max-content);
-      gap: var(--space-24);
-    }
+  .copyright {
+    max-inline-size: none;
+  }
 
+  .legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-6);
+  }
+
+  .legal a {
+    min-block-size: var(--tap-target);
+    font-size: var(--text-sm);
+  }
+
+  /* Escritorio: mapa | logo | redes y sucursales. */
+  @media (width >= 64rem) {
     .inner {
       padding-block-start: var(--space-24);
+    }
+
+    .main {
+      grid-template-areas: 'sitemap logo connect';
+      grid-template-columns: 1fr minmax(0, 30rem) 1fr;
+      align-items: center;
+      gap: var(--space-8);
+    }
+
+    /* El bloque derecho se alinea al borde del contenedor. */
+    .connect {
+      place-self: start end;
+    }
+
+    .sitemap {
+      align-self: start;
+    }
+
+    .bottom {
+      grid-template-columns: 1fr auto;
+      align-items: center;
     }
   }
 </style>

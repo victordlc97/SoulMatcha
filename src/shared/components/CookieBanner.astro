@@ -1,0 +1,180 @@
+---
+import { withBase } from '../url';
+---
+
+<!--
+  AVISO DE COOKIES, discreto. No es un muro: no bloquea ni oscurece la página.
+  - Hoy el sitio solo usa almacenamiento técnico (ver /cookies/), así que no hay nada que "rechazar":
+    la elección queda guardada para cuando, si algún día se suma analítica, solo se active con "Aceptar".
+  - Nace oculto (`hidden`) y el script lo muestra solo si no hay elección guardada: sin parpadeo.
+  - La página de cookies puede reabrirlo con el evento `sm:consent-reset`.
+-->
+<div
+  class="consent"
+  role="region"
+  aria-label="Preferencias de cookies"
+  data-consent-banner
+  hidden
+>
+  <p class="text">
+    Solo usamos almacenamiento técnico para recordar tus preferencias. No
+    rastreamos tu visita. <a href={withBase('cookies/')}>Más información</a>
+  </p>
+
+  <div class="actions">
+    <button type="button" class="accept" data-consent="accepted">
+      Aceptar
+    </button>
+    <button type="button" class="essential" data-consent="essential">
+      Solo necesarias
+    </button>
+  </div>
+</div>
+
+<style>
+  .consent {
+    position: fixed;
+    inset-block-end: var(--space-4);
+    inset-inline: var(--gutter);
+    z-index: var(--z-consent);
+    display: grid;
+    gap: var(--space-3);
+    max-inline-size: 26rem;
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    background: var(--glass-bg-strong);
+    box-shadow: var(--shadow-float);
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+
+    /* stylelint-disable-next-line property-no-vendor-prefix -- Safari < 18 */
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+
+  .consent[hidden] {
+    display: none;
+  }
+
+  /* Escritorio: esquina inferior derecha, para no tapar los botones del hero (abajo a la izquierda). */
+  @media (width >= 40rem) {
+    .consent {
+      inset-inline: auto var(--gutter);
+    }
+  }
+
+  .text {
+    max-inline-size: none;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  button {
+    min-block-size: var(--button-height-sm);
+    padding-inline: var(--space-6);
+    border: 2px solid transparent;
+    border-radius: var(--radius-pill);
+    font: inherit;
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out-soft);
+  }
+
+  .accept {
+    background: var(--surface-footer);
+    color: var(--text-on-rose);
+  }
+
+  .essential {
+    background: transparent;
+    color: var(--text-primary);
+  }
+
+  .essential:hover {
+    background: var(--hover-tint);
+  }
+
+  /* Entra suave cuando termina la pantalla de carga. Sin movimiento si el usuario lo pide. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html[data-loader='done']) .consent:not([hidden]) {
+      animation: consent-in var(--duration-slow) var(--ease-out-soft) both;
+    }
+
+    @keyframes consent-in {
+      from {
+        opacity: 0;
+        transform: translateY(var(--space-3));
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  }
+</style>
+
+<script>
+  import {
+    clearConsent,
+    isConsent,
+    readConsent,
+    saveConsent,
+  } from '../consent';
+
+  const html = document.documentElement;
+  const banner = document.querySelector<HTMLElement>('[data-consent-banner]');
+
+  if (banner) {
+    // Mientras el aviso está abierto se reserva espacio al final de la página (ver global.css),
+    // para que nunca tape los enlaces del footer.
+    const reserveSpace = () => {
+      html.style.setProperty(
+        '--consent-space',
+        `${banner.offsetHeight + 32}px`,
+      );
+    };
+    const resizeObserver = new ResizeObserver(reserveSpace);
+
+    const open = () => {
+      banner.hidden = false;
+      html.dataset.consentOpen = '';
+      reserveSpace();
+      resizeObserver.observe(banner);
+    };
+
+    const close = () => {
+      banner.hidden = true;
+      delete html.dataset.consentOpen;
+      html.style.removeProperty('--consent-space');
+      resizeObserver.disconnect();
+    };
+
+    if (!readConsent()) open();
+
+    banner
+      .querySelectorAll<HTMLButtonElement>('[data-consent]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          const choice = button.dataset.consent;
+          if (!isConsent(choice)) return;
+          saveConsent(choice);
+          close();
+          document.dispatchEvent(new CustomEvent('sm:consent-change'));
+        });
+      });
+
+    // La página de cookies permite cambiar la elección: borra y vuelve a preguntar.
+    document.addEventListener('sm:consent-reset', () => {
+      clearConsent();
+      open();
+      document.dispatchEvent(new CustomEvent('sm:consent-change'));
+    });
+  }
+</script>

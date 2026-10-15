@@ -1,0 +1,84 @@
+---
+import SectionTitle from '../shared/components/SectionTitle.astro';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Fecha de la última revisión del texto, en lenguaje natural. */
+  updated: string;
+}
+
+const { title, description, updated } = Astro.props;
+---
+
+<!--
+  Plantilla de páginas legales: texto largo, columna angosta, sin adornos.
+  El cuerpo va en el slot, con h2/p/ul normales: aquí se les da estilo.
+-->
+<BaseLayout title={`${title} | Soul Matcha`} description={description}>
+  <article class="legal">
+    <div class="container">
+      <SectionTitle level="h1">{title}</SectionTitle>
+      <p class="updated">Última actualización: {updated}</p>
+
+      <div class="body">
+        <slot />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .legal {
+    /* Deja espacio al header flotante, que aquí no tiene hero debajo. */
+    padding-block: var(--space-32) var(--space-16);
+  }
+
+  .updated {
+    margin-block-start: var(--space-3);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+  }
+
+  .body {
+    display: grid;
+    gap: var(--space-4);
+    max-inline-size: var(--measure);
+    margin-block-start: var(--space-12);
+  }
+
+  .body :global(h2) {
+    margin-block-start: var(--space-8);
+    font-family: var(--font-body);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .body :global(ul) {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding-inline-start: var(--space-6);
+  }
+
+  .body :global(code) {
+    padding: 0.1em 0.4em;
+    border-radius: var(--radius-sm);
+    background: var(--surface-alt);
+    font-size: 0.9em;
+  }
+
+  /* Dato que falta y debe completarse antes de publicar: que no pase desapercibido. */
+  .body :global(.pending) {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
+    background: var(--surface-blush);
+  }
+
+  @media (width >= 48rem) {
+    .legal {
+      padding-block-end: var(--space-32);
+    }
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { withBase } from '../shared/url';
+---
+
+<LegalLayout
+  title="Aviso de privacidad"
+  description="Cómo trata Soul Matcha la información de quienes visitan este sitio."
+  updated="15 de octubre de 2026"
+>
+  <h2>Resumen</h2>
+  <p>
+    Este sitio es una página informativa. No recopilamos datos personales: no
+    hay formularios, cuentas de usuario, compras ni comentarios.
+  </p>
+
+  <h2>Lo que no hacemos</h2>
+  <ul>
+    <li>No usamos analítica ni herramientas de medición.</li>
+    <li>No usamos publicidad ni píxeles de seguimiento.</li>
+    <li>
+      No incrustamos contenido de terceros, como mapas, videos o botones de
+      redes sociales.
+    </li>
+    <li>
+      No cargamos recursos de otros dominios: las tipografías y las imágenes se
+      sirven desde este mismo sitio.
+    </li>
+  </ul>
+
+  <h2>Datos técnicos del alojamiento</h2>
+  <p>
+    Este sitio se aloja en GitHub Pages. Como ocurre en cualquier servidor web,
+    el proveedor puede registrar datos técnicos de cada visita (por ejemplo, la
+    dirección IP, el navegador y la fecha) con fines de seguridad y
+    funcionamiento. Nosotros no accedemos a esos registros ni los utilizamos.
+    Para ver cómo los trata, consulta la{' '}
+    <a
+      href="https://docs.github.com/es/site-policy/privacy-policies/github-general-privacy-statement"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      declaración de privacidad de GitHub
+    </a>{' '}
+    de ese proveedor.
+  </p>
+  <p>Si cambiamos de proveedor de alojamiento, actualizaremos este aviso.</p>
+
+  <h2>Almacenamiento en tu navegador</h2>
+  <p>
+    El sitio guarda en tu navegador unos pocos datos técnicos para funcionar. No
+    contienen información personal. Consulta el detalle en la{' '}
+    <a href={withBase('cookies/')}>página de cookies</a>.
+  </p>
+
+  <h2>Enlaces a otros sitios</h2>
+  <p>
+    Cuando agreguemos enlaces a redes sociales u otros sitios, estos tendrán sus
+    propias políticas de privacidad, ajenas a este aviso.
+  </p>
+
+  <h2>Cambios en este aviso</h2>
+  <p>
+    Si el sitio empieza a recopilar datos (por ejemplo, con un formulario de
+    contacto o con analítica), actualizaremos este aviso antes y, cuando
+    corresponda, te pediremos tu consentimiento.
+  </p>
+
+  <h2>Responsable y contacto</h2>
+  <p class="pending">
+    Pendiente: nombre o razón social del responsable y un medio de contacto (por
+    ejemplo, un correo).
+  </p>
+</LegalLayout>

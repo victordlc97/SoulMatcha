@@ -144,13 +144,13 @@ test('no hay desbordamiento horizontal en móvil', async ({ page }) => {
   expect(overflow).toBeLessThanOrEqual(0);
 });
 
-test('los dos botones del hero llevan a la galería y a la página de sucursales', async ({
+test('los dos botones del hero llevan a la galería (rosa) y a la página de sucursales', async ({
   page,
 }) => {
   await page.goto('./');
   const hero = page.locator('section.hero');
   await expect(
-    hero.getByRole('link', { name: 'Ver producto' }),
+    hero.getByRole('link', { name: 'Conoce Soul Matcha' }),
   ).toHaveAttribute('href', '/SoulMatcha/#galeria');
   await hero.getByRole('link', { name: 'Ver sucursales' }).click();
   await expect(page).toHaveURL(/\/sucursales\/$/);
@@ -200,4 +200,57 @@ test('con movimiento reducido las transiciones se anulan', async ({
     .evaluate((el) => getComputedStyle(el).transitionDuration);
   expect(parseFloat(duration)).toBeLessThan(0.001);
   await context.close();
+});
+
+test('el aviso de cookies aparece, se recuerda la elección y se puede reabrir desde /cookies/', async ({
+  page,
+}) => {
+  await page.goto('./');
+  const banner = page.getByRole('region', { name: 'Preferencias de cookies' });
+  await expect(banner).toBeVisible();
+
+  await banner.getByRole('button', { name: 'Aceptar' }).click();
+  await expect(banner).toBeHidden();
+
+  // La elección persiste entre cargas.
+  await page.reload();
+  await expect(banner).toBeHidden();
+
+  // Y se puede cambiar desde la página de cookies.
+  await page.goto('./cookies/');
+  await expect(page.locator('[data-consent-status]')).toHaveText('Aceptar');
+  await page.getByRole('button', { name: 'Cambiar mi elección' }).click();
+  await expect(banner).toBeVisible();
+  await expect(page.locator('[data-consent-status]')).toHaveText('Sin elegir');
+});
+
+test('las páginas legales existen y el footer enlaza a ellas', async ({
+  page,
+}) => {
+  await page.goto('./');
+  const legal = page
+    .getByRole('contentinfo')
+    .getByRole('navigation', { name: 'Legal' });
+  await legal.getByRole('link', { name: 'Aviso de privacidad' }).click();
+  await expect(page).toHaveURL(/\/privacidad\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Aviso de privacidad',
+  );
+
+  await page.goto('./cookies/');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cookies');
+});
+
+test('el footer ordena mapa, logo y redes/sucursales de izquierda a derecha', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('./');
+  const x = async (selector: string) =>
+    (await page.locator(selector).first().boundingBox())!.x;
+  const sitemap = await x('.site-footer .sitemap');
+  const logo = await x('.site-footer .wordmark');
+  const connect = await x('.site-footer .connect');
+  expect(sitemap).toBeLessThan(logo);
+  expect(logo).toBeLessThan(connect);
 });

@@ -26,8 +26,10 @@ import { withBase } from '../../shared/url';
     </div>
 
     <div class="actions">
-      <Button href={withBase('#galeria')}>Ver producto</Button>
-      <Button href={withBase('sucursales/')} variant="secondary">
+      <Button href={withBase('#galeria')} variant="rose" size="sm">
+        Conoce Soul Matcha
+      </Button>
+      <Button href={withBase('sucursales/')} variant="secondary" size="sm">
         Ver sucursales
       </Button>
     </div>
@@ -99,7 +101,7 @@ import { withBase } from '../../shared/url';
     position: relative;
     z-index: 2;
     display: grid;
-    gap: var(--space-8);
+    gap: var(--space-6);
     justify-items: start;
     padding-block: var(--space-24) var(--space-12);
   }
@@ -114,9 +116,9 @@ import { withBase } from '../../shared/url';
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: var(--space-4);
+    gap: var(--space-3);
     inline-size: 100%;
-    max-inline-size: 22rem;
+    max-inline-size: 16rem;
   }
 
   @media (width >= 40rem) {

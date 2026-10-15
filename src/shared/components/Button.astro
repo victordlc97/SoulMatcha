@@ -1,15 +1,21 @@
 ---
 interface Props {
   href: string;
-  /** `primary`: relleno matcha (acción). `secondary`: contorno claro, para fondos oscuros. */
-  variant?: 'primary' | 'secondary';
+  /**
+   * `primary`: relleno matcha (acción).
+   * `rose`: relleno rosa del footer con texto café profundo (5.2:1).
+   * `secondary`: contorno claro, para fondos oscuros.
+   */
+  variant?: 'primary' | 'rose' | 'secondary';
+  /** `sm`: compacto (hero). */
+  size?: 'md' | 'sm';
 }
 
-const { href, variant = 'primary' } = Astro.props;
+const { href, variant = 'primary', size = 'md' } = Astro.props;
 ---
 
-<!-- Primary: blanco sobre matcha = 3.05:1, solo cumple AA por ser texto grande y en negrita. No reducir. -->
-<a class:list={['button', variant]} href={href}>
+<!-- Primary: blanco sobre matcha = 3.05:1, solo cumple AA por ser texto grande y en negrita. No reducir en `md`. -->
+<a class:list={['button', variant, size]} href={href}>
   <slot />
 </a>
 
@@ -33,9 +39,21 @@ const { href, variant = 'primary' } = Astro.props;
       background-color var(--duration-base) var(--ease-out-soft);
   }
 
+  /* Compacto: ~30 % más pequeño que `md` (texto 20 → 14 px). */
+  .sm {
+    min-block-size: var(--button-height-sm);
+    padding: var(--space-2) var(--space-6);
+    font-size: var(--text-sm);
+  }
+
   .primary {
     background: var(--action);
     color: var(--action-contrast);
+  }
+
+  .rose {
+    background: var(--surface-footer);
+    color: var(--text-on-rose);
   }
 
   .secondary {
