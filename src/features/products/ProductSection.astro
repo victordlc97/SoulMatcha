@@ -1,23 +1,27 @@
 ---
 import { getLocale, useTranslations } from '../../i18n';
 import SectionTitle from '../../shared/components/SectionTitle.astro';
+import GalleryGrid from '../gallery/GalleryGrid.astro';
 
 const t = useTranslations(getLocale(Astro));
 ---
 
 <!--
-  SECCIÓN "PRODUCTO" (reserva; antes "Galería").
-  Destino del botón principal del hero y del enlace "Producto" del menú.
-  Pendiente de fotografía del cliente: reemplazar los .frame por <Image>.
+  SECCIÓN "PRODUCTO". Destino del botón principal del hero y del enlace "Producto" del menú.
+  Las fotos salen de src/features/gallery/<categoría>/: para sumar fotos, soltarlas en su carpeta.
 -->
 <section id="producto" class="product" aria-labelledby="product-title">
   <div class="container">
     <SectionTitle id="product-title">{t.product.title}</SectionTitle>
+    <div class="block">
+      <GalleryGrid category="producto" />
+    </div>
 
-    <div class="grid" aria-hidden="true">
-      <div class="frame">{t.product.photo}</div>
-      <div class="frame">{t.product.photo}</div>
-      <div class="frame">{t.product.photo}</div>
+    <SectionTitle id="process-title" level="h3">
+      {t.product.processTitle}
+    </SectionTitle>
+    <div class="block">
+      <GalleryGrid category="proceso" />
     </div>
   </div>
 </section>
@@ -28,30 +32,17 @@ const t = useTranslations(getLocale(Astro));
     scroll-margin-block-start: var(--space-16);
   }
 
-  .grid {
-    display: grid;
-    gap: var(--space-4);
-    margin-block-start: var(--space-8);
+  .block {
+    margin-block: var(--space-8) var(--space-16);
   }
 
-  .frame {
-    display: grid;
-    place-items: center;
-    aspect-ratio: 4 / 5;
-    border-radius: var(--radius-lg);
-    background: var(--surface-alt);
-    color: var(--text-primary);
-    font-size: var(--text-sm);
+  .block:last-child {
+    margin-block-end: 0;
   }
 
   @media (width >= 48rem) {
     .product {
       padding-block: var(--space-32);
-    }
-
-    .grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--space-8);
     }
   }
 </style>

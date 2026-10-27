@@ -414,3 +414,141 @@ test.describe('versión en inglés', () => {
     ).toHaveAttribute('href', '/SoulMatcha/en/privacy/');
   });
 });
+
+test.describe('sucursales', () => {
+  test('hay una pestaña por sucursal, en orden, y cada una muestra su dirección', async ({
+    page,
+  }) => {
+    await page.goto('./sucursales/');
+    const tabs = page.getByRole('tab');
+    await expect(tabs).toHaveText(['Roma Norte', 'Monte Athos', 'Cancún']);
+    await expect(tabs.first()).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByText('Tabasco 151')).toBeVisible();
+    await expect(page.getByText('Monte Athos 130')).toBeHidden();
+
+    await tabs.nth(1).click();
+    await expect(page.getByText('Monte Athos 130')).toBeVisible();
+    await expect(page.getByText('Tabasco 151')).toBeHidden();
+
+    await tabs.nth(2).click();
+    await expect(page.getByText('Próxima apertura')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Ver mapa' })).toBeHidden();
+  });
+
+  test('las flechas del teclado cambian de pestaña', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(browserName === 'webkit', 'Safari no enfoca con Tab ni clic');
+    await page.goto('./sucursales/');
+    const first = page.getByRole('tab').first();
+    await first.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.getByRole('tab', { name: 'Monte Athos' })).toBeFocused();
+    await expect(
+      page.getByRole('tab', { name: 'Monte Athos' }),
+    ).toHaveAttribute('aria-selected', 'true');
+    await page.keyboard.press('End');
+    await expect(page.getByRole('tab', { name: 'Cancún' })).toBeFocused();
+  });
+
+  test('el mapa de Google no se carga hasta pulsar "Ver mapa"', async ({
+    page,
+  }) => {
+    const google: string[] = [];
+    page.on('request', (r) => {
+      if (r.url().includes('google.com')) google.push(r.url());
+    });
+    await page.goto('./sucursales/');
+    await page.waitForLoadState('networkidle');
+    expect(google).toEqual([]);
+    await expect(page.locator('iframe')).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Ver mapa' }).first().click();
+    const frame = page.locator('iframe');
+    await expect(frame).toHaveCount(1);
+    await expect(frame).toHaveAttribute(
+      'src',
+      /google\.com\/maps\?.*19\.4194586/,
+    );
+    await expect(frame).toHaveAttribute(
+      'title',
+      'Mapa de Soul Matcha Roma Norte',
+    );
+  });
+
+  test('cada sucursal abierta enlaza a su ficha de Google Maps', async ({
+    page,
+  }) => {
+    await page.goto('./sucursales/');
+    await expect(
+      page.getByRole('link', { name: 'Abrir en Google Maps' }).first(),
+    ).toHaveAttribute('href', 'https://maps.app.goo.gl/s1cHzrmcoWVeWFN57');
+    await page.getByRole('tab', { name: 'Monte Athos' }).click();
+    await expect(
+      page.getByRole('link', { name: 'Abrir en Google Maps' }).first(),
+    ).toHaveAttribute('href', 'https://maps.app.goo.gl/kRCnGnks8XAHm8Sh6');
+  });
+
+  test('en inglés las pestañas y los textos están traducidos', async ({
+    page,
+  }) => {
+    await page.goto('./en/branches/');
+    await expect(
+      page.getByRole('tablist', { name: 'Choose a location' }),
+    ).toBeVisible();
+    await page.getByRole('tab', { name: 'Cancún' }).click();
+    await expect(page.getByText('Opening soon')).toBeVisible();
+  });
+});
+
+test.describe('galería', () => {
+  test('Producto y Proceso muestran fotos reales que cargan', async ({
+    page,
+  }) => {
+    await page.goto('./');
+    const product = page.locator('#producto');
+    const imgs = product.locator('img');
+    expect(await imgs.count()).toBeGreaterThanOrEqual(10);
+    await imgs.first().scrollIntoViewIfNeeded();
+    await expect
+      .poll(() =>
+        imgs.first().evaluate((el: HTMLImageElement) => el.naturalWidth),
+      )
+      .toBeGreaterThan(0);
+    await expect(
+      product.getByRole('heading', { name: 'Proceso' }),
+    ).toBeVisible();
+  });
+
+  test('Nosotros muestra sus dos fotos', async ({ page }) => {
+    await page.goto('./');
+    await expect(page.locator('#nosotros img')).toHaveCount(2);
+  });
+});
+
+test('el footer enlaza a Instagram y Uber Eats en pestaña nueva', async ({
+  page,
+}) => {
+  await page.goto('./');
+  const footer = page.getByRole('contentinfo');
+  const ig = footer.getByRole('link', { name: 'Instagram' });
+  await expect(ig).toHaveAttribute(
+    'href',
+    'https://www.instagram.com/soulmatchamx/',
+  );
+  await expect(ig).toHaveAttribute('target', '_blank');
+  await expect(footer.getByRole('link', { name: 'Uber Eats' })).toHaveAttribute(
+    'href',
+    /ubereats\.com\/mx\/store\/soul-matcha\//,
+  );
+});
+
+test('el logo del header deja holgura dentro de la barra', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('./');
+  const bar = (await page.locator('nav.bar').boundingBox())!;
+  const logo = (await page.locator('nav.bar .brand .header').boundingBox())!;
+  expect(logo.y - bar.y).toBeGreaterThanOrEqual(6);
+  expect(bar.y + bar.height - (logo.y + logo.height)).toBeGreaterThanOrEqual(6);
+});

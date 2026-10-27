@@ -2,13 +2,15 @@
 import { getLocale, useTranslations } from '../../i18n';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionTitle from '../../shared/components/SectionTitle.astro';
+import { branches, mapEmbedUrl } from './branches';
 
 /**
- * PÁGINA DE SUCURSALES (reserva). La usan /sucursales/ y /en/branches/.
- * Pendiente: direcciones, horarios y mapa por sucursal. Cuando lleguen, mover los
- * datos a src/content/ (una entrada por sucursal e idioma) y recorrerlos aquí.
+ * PÁGINA DE SUCURSALES. La usan /sucursales/ y /en/branches/.
+ * Una pestaña por sucursal (orden de `branches.ts`). El mapa de Google NO se carga hasta que la
+ * persona lo pide: la política de privacidad dice que no se contacta a terceros por defecto.
  */
-const t = useTranslations(getLocale(Astro));
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
 ---
 
 <BaseLayout
@@ -17,15 +19,78 @@ const t = useTranslations(getLocale(Astro));
   routeKey="branches"
 >
   <section class="branches" aria-labelledby="branches-title">
-    <div class="container">
+    <div class="container" data-tabs>
       <SectionTitle id="branches-title" level="h1">
         {t.branches.title}
       </SectionTitle>
-      <p class="pending">{t.branches.pending}</p>
 
-      <div class="map" aria-hidden="true">
-        {t.branches.map}
+      <!-- Oculta hasta que el JavaScript la activa: sin JS se ven todos los paneles. -->
+      <div
+        class="tablist"
+        role="tablist"
+        aria-label={t.branches.tabsLabel}
+        hidden
+      >
+        {branches.map((branch, i) => (
+          <button
+            type="button"
+            role="tab"
+            id={`tab-${branch.id}`}
+            aria-controls={`panel-${branch.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+          >
+            {t.branches.items[branch.id].tab}
+          </button>
+        ))}
       </div>
+
+      {branches.map((branch) => {
+        const item = t.branches.items[branch.id];
+        return (
+          <article
+            class="panel"
+            role="tabpanel"
+            id={`panel-${branch.id}`}
+            aria-labelledby={`tab-${branch.id}`}
+          >
+            <div class="info">
+              {branch.status === 'soon' && (
+                <p class="badge">{t.branches.soonBadge}</p>
+              )}
+              <h2 class="name">{item.name}</h2>
+              <p class="address">{item.address}</p>
+              {branch.status === 'soon' && (
+                <p class="soon-text">{t.branches.soonText}</p>
+              )}
+              {branch.mapsUrl && (
+                <a
+                  class="maps-link"
+                  href={branch.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t.branches.openInMaps}
+                </a>
+              )}
+            </div>
+
+            {branch.coords && (
+              <div
+                class="map"
+                data-map
+                data-map-src={mapEmbedUrl(branch.coords, locale)}
+                data-map-title={`${t.branches.mapOf} ${item.name}`}
+              >
+                <button type="button" class="map-load" data-map-load hidden>
+                  {t.branches.loadMap}
+                </button>
+                <p class="map-note">{t.branches.mapNote}</p>
+              </div>
+            )}
+          </article>
+        );
+      })}
     </div>
   </section>
 </BaseLayout>
@@ -36,19 +101,132 @@ const t = useTranslations(getLocale(Astro));
     padding-block: var(--space-32) var(--space-16);
   }
 
-  .pending {
-    margin-block-start: var(--space-4);
+  .tablist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-block-start: var(--space-8);
+  }
+
+  .tablist[hidden] {
+    display: none;
+  }
+
+  [role='tab'] {
+    min-block-size: var(--tap-target);
+    padding: var(--space-2) var(--space-6);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--text-primary);
+    font: inherit;
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) var(--ease-out-soft),
+      color var(--duration-fast) var(--ease-out-soft);
+  }
+
+  [role='tab']:hover {
+    background: var(--hover-tint);
+  }
+
+  [role='tab'][aria-selected='true'] {
+    border-color: var(--surface-inverse);
+    background: var(--surface-inverse);
+    color: var(--text-inverse);
+  }
+
+  .panel {
+    display: grid;
+    gap: var(--space-6);
+    margin-block-start: var(--space-8);
+  }
+
+  .panel[hidden] {
+    display: none;
+  }
+
+  .info {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+  }
+
+  .name {
+    font-size: var(--text-2xl);
+    line-height: var(--leading-heading);
+  }
+
+  .address {
     color: var(--text-secondary);
   }
 
+  .badge {
+    inline-size: fit-content;
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-pill);
+    background: var(--surface-blush);
+    color: var(--text-on-rose);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+  }
+
+  .maps-link {
+    display: inline-flex;
+    align-items: center;
+    inline-size: fit-content;
+    min-block-size: var(--tap-target);
+    color: var(--text-link);
+    font-weight: var(--weight-bold);
+    text-underline-offset: 0.25em;
+  }
+
   .map {
+    position: relative;
     display: grid;
-    place-items: center;
-    aspect-ratio: 16 / 9;
-    margin-block-start: var(--space-8);
+    place-content: center;
+    justify-items: center;
+    gap: var(--space-4);
+    aspect-ratio: 4 / 3;
+    padding: var(--space-6);
+    overflow: hidden;
     border-radius: var(--radius-lg);
     background: var(--surface-alt);
     color: var(--text-primary);
+    text-align: center;
+  }
+
+  .map :global(iframe) {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    border: 0;
+  }
+
+  .map-load {
+    min-block-size: var(--tap-target);
+    padding: var(--space-2) var(--space-8);
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--surface-inverse);
+    color: var(--text-inverse);
+    font: inherit;
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .map-load[hidden] {
+    display: none;
+  }
+
+  .map-note {
+    max-inline-size: 32ch;
     font-size: var(--text-sm);
   }
 
@@ -56,5 +234,30 @@ const t = useTranslations(getLocale(Astro));
     .branches {
       padding-block-end: var(--space-32);
     }
+
+    .panel {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--space-12);
+      align-items: start;
+    }
+
+    /* Sin mapa (próxima apertura) el texto no se estira a media página. */
+    .panel:not(:has(.map)) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .map {
+      aspect-ratio: 16 / 11;
+    }
   }
 </style>
+
+<script>
+  import { initMapLoaders, initTabs } from './tabs';
+
+  const root = document.querySelector<HTMLElement>('[data-tabs]');
+  if (root) {
+    initTabs(root);
+    initMapLoaders(root);
+  }
+</script>

@@ -33,18 +33,45 @@ export const es = {
   about: {
     title: 'Nosotros',
     pending: 'Texto de marca pendiente de contenido del cliente.',
-    photo: 'Fotografía',
   },
   product: {
     title: 'Producto',
-    photo: 'Fotografía',
+    processTitle: 'Proceso',
+  },
+  gallery: {
+    producto: 'Fotografía de producto Soul Matcha',
+    proceso: 'Fotografía del proceso del matcha',
+    historia: 'Fotografía de la historia de Soul Matcha',
   },
   branches: {
     title: 'Sucursales',
     metaTitle: 'Sucursales | Soul Matcha',
     description: 'Encuentra la sucursal de Soul Matcha más cercana.',
-    pending: 'Pronto publicaremos las direcciones de cada sucursal.',
-    map: 'Mapa',
+    tabsLabel: 'Elige una sucursal',
+    openInMaps: 'Abrir en Google Maps',
+    loadMap: 'Ver mapa',
+    mapOf: 'Mapa de',
+    mapNote:
+      'El mapa lo sirve Google: al cargarlo, Google puede guardar cookies en tu navegador.',
+    soonBadge: 'Próxima apertura',
+    soonText: 'Muy pronto abriremos en Cancún, México. ¡Te esperamos!',
+    items: {
+      'roma-norte': {
+        tab: 'Roma Norte',
+        name: 'Soul Matcha Roma Norte',
+        address: 'Tabasco 151, Colonia Roma Norte, CDMX',
+      },
+      'monte-athos': {
+        tab: 'Monte Athos',
+        name: 'Soul Matcha Monte Athos',
+        address: 'Monte Athos 130, Lomas de Chapultepec, CDMX',
+      },
+      cancun: {
+        tab: 'Cancún',
+        name: 'Soul Matcha Cancún',
+        address: 'Cancún, México',
+      },
+    },
   },
   footer: {
     home: 'Inicio',
@@ -103,18 +130,45 @@ export const en: Dictionary = {
   about: {
     title: 'About us',
     pending: 'Brand copy pending content from the client.',
-    photo: 'Photograph',
   },
   product: {
     title: 'Product',
-    photo: 'Photograph',
+    processTitle: 'Process',
+  },
+  gallery: {
+    producto: 'Soul Matcha product photograph',
+    proceso: 'Photograph of the matcha process',
+    historia: 'Photograph of the Soul Matcha story',
   },
   branches: {
     title: 'Locations',
     metaTitle: 'Locations | Soul Matcha',
     description: 'Find the Soul Matcha location nearest to you.',
-    pending: 'We will publish the address of each location soon.',
-    map: 'Map',
+    tabsLabel: 'Choose a location',
+    openInMaps: 'Open in Google Maps',
+    loadMap: 'Show map',
+    mapOf: 'Map of',
+    mapNote:
+      'The map is served by Google: when it loads, Google may store cookies in your browser.',
+    soonBadge: 'Opening soon',
+    soonText: 'We will be opening in Cancún, Mexico very soon. See you there!',
+    items: {
+      'roma-norte': {
+        tab: 'Roma Norte',
+        name: 'Soul Matcha Roma Norte',
+        address: 'Tabasco 151, Colonia Roma Norte, Mexico City',
+      },
+      'monte-athos': {
+        tab: 'Monte Athos',
+        name: 'Soul Matcha Monte Athos',
+        address: 'Monte Athos 130, Lomas de Chapultepec, Mexico City',
+      },
+      cancun: {
+        tab: 'Cancún',
+        name: 'Soul Matcha Cancún',
+        address: 'Cancún, Mexico',
+      },
+    },
   },
   footer: {
     home: 'Home',

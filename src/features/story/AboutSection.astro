@@ -1,15 +1,18 @@
 ---
+import { Image } from 'astro:assets';
 import { getLocale, useTranslations } from '../../i18n';
 import SectionTitle from '../../shared/components/SectionTitle.astro';
+import { galleryImages } from '../gallery/gallery';
 
 const t = useTranslations(getLocale(Astro));
+// Las dos primeras de gallery/historia/. El resto queda disponible para una galería de historia.
+const [tall, square] = galleryImages('historia');
+const alt = t.gallery.historia;
 ---
 
 <!--
-  SECCIÓN "NOSOTROS" (reserva).
-  Composición asimétrica pensada para: un texto de marca y dos fotografías.
-  Pendiente de contenido del cliente: reemplazar los .frame por <Image> y
-  el bloque .copy por el texto real (idealmente desde src/content/).
+  SECCIÓN "NOSOTROS". Composición asimétrica: un texto de marca y dos fotografías.
+  Pendiente de contenido del cliente: el bloque .copy por el texto real (idealmente desde src/content/).
 -->
 <section id="nosotros" class="about" aria-labelledby="about-title">
   <div class="container grid">
@@ -18,12 +21,28 @@ const t = useTranslations(getLocale(Astro));
       <p class="pending">{t.about.pending}</p>
     </div>
 
-    <div class="frame tall" aria-hidden="true">
-      {t.about.photo}
-    </div>
-    <div class="frame square" aria-hidden="true">
-      {t.about.photo}
-    </div>
+    {tall && (
+      <Image
+        class="frame tall"
+        src={tall}
+        alt={alt}
+        format="webp"
+        widths={[480, 800, 1200]}
+        sizes="(min-width: 48rem) 33vw, 100vw"
+        loading="lazy"
+      />
+    )}
+    {square && (
+      <Image
+        class="frame square"
+        src={square}
+        alt={alt}
+        format="webp"
+        widths={[360, 640, 960]}
+        sizes="(min-width: 48rem) 25vw, 100vw"
+        loading="lazy"
+      />
+    )}
   </div>
 </section>
 
@@ -49,12 +68,11 @@ const t = useTranslations(getLocale(Astro));
   }
 
   .frame {
-    display: grid;
-    place-items: center;
+    inline-size: 100%;
+    block-size: auto;
+    object-fit: cover;
     border-radius: var(--radius-lg);
     background: var(--surface-alt);
-    color: var(--text-primary);
-    font-size: var(--text-sm);
   }
 
   .tall {
