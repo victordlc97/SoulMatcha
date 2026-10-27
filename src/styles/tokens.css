@@ -156,9 +156,11 @@
   --radius-lg: 1.5rem;
   --tap-target: 2.75rem; /* 44 px */
 
-  /* 68 px de ancho (~56 de alto): barra delgada. OJO: el manual exige mínimo 80.4 px en web; se baja
-     por decisión de diseño. Para cumplirlo estrictamente: 5.1rem (la barra crece ~15 px). */
-  --logo-header-width: 4.25rem;
+  /* 48 px de ancho (~39 de alto): cabe en la barra (la fija el botón de 44 px + relleno) con holgura
+     arriba y abajo. Historial: 68 px (~56 de alto) quedaba al ras de los bordes de la barra.
+     OJO: el manual exige mínimo 80.4 px en web; se baja por decisión de diseño. Para cumplirlo
+     estrictamente: 5.1rem (la barra crece ~15 px). */
+  --logo-header-width: 3rem;
   --button-height-sm: 2.5rem; /* 40 px: botones compactos (cumple el mínimo AA de 24 px) */
   --header-offset: var(
     --space-4

@@ -41,8 +41,8 @@ const { size = 'header' } = Astro.props;
       src={logoBrown}
       alt=""
       format="webp"
-      widths={[164, 246, 328]}
-      sizes="82px"
+      widths={[96, 144, 192]}
+      sizes="48px"
       loading="eager"
     />
     {size === 'header' && (
@@ -51,8 +51,8 @@ const { size = 'header' } = Astro.props;
         src={logoWhite}
         alt=""
         format="webp"
-        widths={[164, 246, 328]}
-        sizes="82px"
+        widths={[96, 144, 192]}
+        sizes="48px"
         loading="eager"
       />
     )}
@@ -60,7 +60,7 @@ const { size = 'header' } = Astro.props;
 )}
 
 <style>
-  /* El logotipo mide mínimo 80.4 px en web (manual de identidad): ver --logo-header-width. */
+  /* Ancho del logotipo en la barra: ver --logo-header-width (el manual pide mínimo 80.4 px; ahí se explica la excepción). */
   .header {
     position: relative;
     display: block;
