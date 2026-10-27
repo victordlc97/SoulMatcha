@@ -14,10 +14,16 @@ const sitemap = [
 ];
 
 /**
- * Redes sociales. PENDIENTE: las cuentas reales (nombre y URL) las debe dar el cliente.
- * Cada entrada: { label: 'Instagram', href: 'https://…' }. Mientras esté vacío se muestra un aviso.
+ * Redes y plataformas. Cada entrada: { label, href }. Si algún día queda vacío se muestra un aviso.
+ * PENDIENTE: confirmar con el cliente si hay más cuentas (Facebook, TikTok...).
  */
-const social: { label: string; href: string }[] = [];
+const social: { label: string; href: string }[] = [
+  { label: 'Instagram', href: 'https://www.instagram.com/soulmatchamx/' },
+  {
+    label: 'Uber Eats',
+    href: 'https://www.ubereats.com/mx/store/soul-matcha/G62TtAjuVP2aiXBP4XePHQ',
+  },
+];
 
 const legal = [
   { label: t.footer.privacy, href: href('privacy', locale) },
