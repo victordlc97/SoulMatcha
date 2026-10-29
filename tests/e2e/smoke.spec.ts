@@ -1035,3 +1035,142 @@ test.describe('aviso de privacidad', () => {
     ).toHaveCount(0);
   });
 });
+
+test.describe('carga rápida en celular', () => {
+  /** El video "se pidió" cuando ya tiene metadatos o está descargando (funciona igual en WebKit). */
+  const videoStarted = (page: import('@playwright/test').Page) =>
+    page.evaluate(() => {
+      const v = document.querySelector('video')!;
+      return v.readyState > 0 || v.networkState === 2;
+    });
+
+  /** Vigila desde el primer instante si el video empezó ANTES de que terminara la pantalla de carga. */
+  const watchEarlyVideo = (page: import('@playwright/test').Page) =>
+    page.addInitScript(() => {
+      (window as unknown as { __early: boolean }).__early = false;
+      const timer = setInterval(() => {
+        const v = document.querySelector('video');
+        if (document.documentElement.dataset.loader === 'done') {
+          clearInterval(timer);
+        } else if (v && (v.readyState > 0 || v.networkState === 2)) {
+          (window as unknown as { __early: boolean }).__early = true;
+        }
+      }, 20);
+    });
+
+  const loaderDone = (page: import('@playwright/test').Page) =>
+    expect(page.locator('html')).toHaveAttribute('data-loader', 'done', {
+      timeout: 8000,
+    });
+
+  test('la pantalla de carga no espera al evento load: una imagen lenta no la retiene', async ({
+    page,
+  }) => {
+    // Un recurso que tarda 8 s y retiene el evento `load` (como las fotos diferidas cercanas en móvil).
+    await page.route('**/__lento.png*', async (route) => {
+      await new Promise((r) => setTimeout(r, 8000));
+      await route.fulfill({ status: 404, body: '' }).catch(() => undefined);
+    });
+    await page.addInitScript(() => {
+      document.addEventListener('DOMContentLoaded', () => {
+        const img = new Image();
+        img.src = '/__lento.png?t=' + Date.now();
+        img.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0';
+        document.body.append(img);
+      });
+    });
+    const t0 = Date.now();
+    await page.goto('./', { waitUntil: 'commit' });
+    await loaderDone(page);
+    const elapsed = Date.now() - t0;
+    // Terminó mucho antes del tope de seguridad (6 s) y de los 8 s de la imagen, sin que `load` ocurriera…
+    // (si algo vuelve a esperar a `load`, p. ej. document.fonts.ready en WebKit, esto llega a ~6 s).
+    expect(elapsed).toBeLessThan(4000);
+    expect(await page.evaluate(() => document.readyState)).not.toBe('complete');
+    // …pero respetando el mínimo de ~900 ms para que no parpadee.
+    expect(elapsed).toBeGreaterThanOrEqual(850);
+  });
+
+  test('el video no empieza a descargarse mientras la pantalla de carga está visible y arranca después', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName === 'webkit',
+      'El WebKit de Playwright (Windows) ignora preload="none" y carga el video; Safari real no se probó',
+    );
+    await watchEarlyVideo(page);
+    await page.goto('./');
+    await loaderDone(page);
+    expect(
+      await page.evaluate(
+        () => (window as unknown as { __early: boolean }).__early,
+      ),
+    ).toBe(false);
+    await expect.poll(() => videoStarted(page), { timeout: 10000 }).toBe(true);
+  });
+
+  test('con movimiento reducido el video no se descarga hasta que la persona lo pide', async ({
+    browser,
+    browserName,
+  }) => {
+    test.skip(
+      browserName === 'webkit',
+      'El WebKit de Playwright (Windows) ignora preload="none" y carga el video; Safari real no se probó',
+    );
+    const context = await browser.newContext({ reducedMotion: 'reduce' });
+    const page = await context.newPage();
+    await page.goto('./');
+    await loaderDone(page);
+    await page.waitForTimeout(1500);
+    expect(await videoStarted(page)).toBe(false);
+
+    await page.getByRole('button', { name: 'Reproducir video' }).click();
+    await expect.poll(() => videoStarted(page), { timeout: 10000 }).toBe(true);
+    await context.close();
+  });
+
+  test('con ahorro de datos solo se ve el póster y el video se pide solo si la persona lo reproduce', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName === 'webkit',
+      'El WebKit de Playwright (Windows) ignora preload="none" y carga el video; Safari real no se probó',
+    );
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'connection', {
+        get: () => ({ saveData: true, effectiveType: '4g' }),
+      });
+    });
+    await page.goto('./');
+    await loaderDone(page);
+    await page.waitForTimeout(1500);
+    expect(await videoStarted(page)).toBe(false);
+    await expect(
+      page.getByRole('button', { name: 'Reproducir video' }),
+    ).toBeVisible();
+
+    await page.getByRole('button', { name: 'Reproducir video' }).click();
+    await expect.poll(() => videoStarted(page), { timeout: 10000 }).toBe(true);
+  });
+
+  test('en conexión lenta (3g) tampoco se descarga el video por sí solo', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName === 'webkit',
+      'El WebKit de Playwright (Windows) ignora preload="none" y carga el video; Safari real no se probó',
+    );
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'connection', {
+        get: () => ({ saveData: false, effectiveType: '3g' }),
+      });
+    });
+    await page.goto('./');
+    await loaderDone(page);
+    await page.waitForTimeout(1500);
+    expect(await videoStarted(page)).toBe(false);
+  });
+});

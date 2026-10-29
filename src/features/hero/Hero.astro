@@ -14,8 +14,9 @@ const t = useTranslations(locale);
  * - Escritorio (≥ 64rem): el video vertical NO se estira a pantalla completa (se ampliaría 3× y
  *   se recortaría a una franja): va en un arco a la derecha, a tamaño casi nativo, y el slogan
  *   queda sobre café sólido.
- * El video es decorativo (aria-hidden): lo que tiene significado va en HTML real. Se reproduce solo
- * si la persona no pidió movimiento reducido (hero-video.ts) y tiene botón de pausa (WCAG 2.2.2).
+ * El video es decorativo (aria-hidden): lo que tiene significado va en HTML real. NO se descarga con
+ * la página (preload="none"): arranca cuando termina la pantalla de carga y solo si no hay movimiento
+ * reducido, ahorro de datos ni conexión lenta (hero-video.ts); tiene botón de pausa (WCAG 2.2.2).
  */
 const video = withBase('hero/hero.mp4');
 const poster = withBase('hero/hero-poster.webp');
@@ -29,7 +30,7 @@ const poster = withBase('hero/hero-poster.webp');
       muted
       loop
       playsinline
-      preload="auto"
+      preload="none"
       poster={poster}
       tabindex="-1"
     >

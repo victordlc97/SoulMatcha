@@ -5,7 +5,8 @@ import logo from '../assets/logo-footer.jpg';
 
 <!--
   PANTALLA DE CARGA. Mismos colores y logo que el footer (rosa + logo blanco).
-  - Se ve desde el primer pintado y se oculta al terminar `load` (mínimo ~900 ms, para que no parpadee).
+  - Se ve desde el primer pintado y se oculta cuando están listos la tipografía y el póster del hero
+    (mínimo ~900 ms, para que no parpadee). NO espera al evento `load`: ver el script.
   - Solo aparece una vez por sesión: el script del <head> (BaseLayout) pone data-loader="done"
     antes del primer pintado si ya se mostró.
   - Sin JavaScript no se muestra nunca (<noscript> en BaseLayout); además hay un tope de 6 s.
@@ -84,24 +85,46 @@ import logo from '../assets/logo-footer.jpg';
   const start = performance.now();
 
   const finish = () => {
+    if (html.dataset.loader === 'done') return;
     html.dataset.loader = 'done';
     try {
       sessionStorage.setItem('sm-loader-seen', '1');
     } catch {
       // Sin almacenamiento (modo privado): el loader se mostrará en cada carga. No es grave.
     }
+    // El video del hero espera este aviso para empezar a descargarse (hero-video.ts).
+    window.dispatchEvent(new Event('sm:loader-done'));
   };
 
-  const finishAfterMinimum = () => {
-    const elapsed = performance.now() - start;
-    window.setTimeout(finish, Math.max(0, MIN_VISIBLE_MS - elapsed));
-  };
+  /**
+   * Antes esperaba al evento `load`, que incluye TODAS las imágenes cercanas a la pantalla y el
+   * video: en una red lenta la pantalla de carga duraba ~3.5 s. Ahora solo espera lo que el primer
+   * vistazo necesita: la tipografía y el póster del hero.
+   */
+  // OJO: no usar `document.fonts.ready`. En WebKit (Safari) no se resuelve hasta que termina `load`,
+  // y eso reintroduce justo la espera que se quiere evitar. `fonts.load()` resuelve al llegar la fuente.
+  const fontsReady = (): Promise<unknown> =>
+    document.fonts
+      ? document.fonts.load('400 1rem "Montserrat Variable"')
+      : Promise.resolve();
 
-  if (document.readyState === 'complete') {
-    finishAfterMinimum();
-  } else {
-    window.addEventListener('load', finishAfterMinimum, { once: true });
-  }
+  const posterReady = (): Promise<unknown> =>
+    new Promise((resolve) => {
+      const url = document
+        .querySelector<HTMLVideoElement>('[data-hero-video]')
+        ?.getAttribute('poster');
+      if (!url) return resolve(undefined);
+      const img = new Image();
+      img.onload = img.onerror = () => resolve(undefined);
+      img.src = url;
+    });
+
+  Promise.all([fontsReady(), posterReady()])
+    .catch(() => undefined)
+    .then(() => {
+      const elapsed = performance.now() - start;
+      window.setTimeout(finish, Math.max(0, MIN_VISIBLE_MS - elapsed));
+    });
 
   // Red de seguridad: nunca dejar la página tapada.
   window.setTimeout(finish, MAX_WAIT_MS);
