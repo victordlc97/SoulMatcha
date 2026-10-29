@@ -41,3 +41,6 @@ skills-lock.json
 
 # Originales pesados de fotografía (la versión optimizada vive en src/)
 originales/
+
+# Material fuente del cliente (no es parte del sitio; pesa 21 MB)
+/SOUL MATCHA WHOLESALE.pdf

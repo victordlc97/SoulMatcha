@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import { getLocale, useTranslations } from '../../i18n';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionTitle from '../../shared/components/SectionTitle.astro';
-import { wholesaleEmail } from './contact';
+import { contactEmail } from '../../shared/contact';
 import bar from './bar.jpg';
 
 /**
@@ -57,8 +57,8 @@ const w = t.wholesale;
         <p class="text">{w.mayoreoText}</p>
         <p class="contact">
           {w.contact}{' '}
-          <a class="mail" href={`mailto:${wholesaleEmail}`}>
-            {wholesaleEmail}
+          <a class="mail" href={`mailto:${contactEmail}`}>
+            {contactEmail}
           </a>
         </p>
       </div>

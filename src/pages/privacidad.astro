@@ -1,42 +1,111 @@
 ---
-import LegalLayout from '../layouts/LegalLayout.astro';
 import { href } from '../i18n';
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { contactEmail } from '../shared/contact';
+
+/*
+ * Aviso de privacidad (español). El sitio NO tiene formularios ni guarda datos: el único tratamiento
+ * real de datos personales es el correo electrónico con el que la gente nos escribe. Mantenerlo
+ * sincronizado con src/pages/en/privacy.astro. Texto sin revisar por un abogado.
+ * Pendiente del cliente: razón social y domicilio del responsable (hoy figura solo "Soul Matcha").
+ */
 ---
 
 <LegalLayout
   title="Aviso de privacidad"
-  description="Cómo trata Soul Matcha la información de quienes visitan este sitio."
-  updated="15 de octubre de 2026"
+  description="Cómo trata Soul Matcha la información de quienes visitan este sitio y de quienes nos escriben."
+  updated="29 de octubre de 2026"
   routeKey="privacy"
 >
   <h2>Resumen</h2>
   <p>
-    Este sitio es una página informativa. No recopilamos datos personales: no
-    hay formularios, cuentas de usuario, compras ni comentarios.
+    Este sitio es informativo. No tiene formularios, cuentas de usuario, compras
+    ni comentarios, y no guarda datos personales de quienes lo visitan. La única
+    forma de contactarnos es por correo electrónico: más abajo explicamos qué
+    pasa con los datos que nos envías al escribirnos.
   </p>
 
-  <h2>Lo que no hacemos</h2>
+  <h2>Responsable del tratamiento</h2>
+  <p>
+    Soul Matcha es responsable del tratamiento de los datos personales que nos
+    envíes por correo electrónico. Puedes contactarnos en{' '}
+    <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
+  </p>
+
+  <h2>Qué datos tratamos</h2>
+  <p>
+    Solo los que tú nos envías al escribirnos: tu dirección de correo
+    electrónico, tu nombre si lo incluyes y el contenido de tu mensaje. No te
+    pedimos datos personales sensibles (por ejemplo, de salud, origen étnico o
+    religión): te pedimos que no los incluyas.
+  </p>
+
+  <h2>Para qué los usamos</h2>
+  <p>
+    Para responder tu consulta, por ejemplo sobre wholesale, alianzas o
+    sucursales, y darle seguimiento. No los usamos para publicidad ni para
+    elaborar perfiles.
+  </p>
+
+  <h2>Con quién los compartimos</h2>
+  <p>
+    No vendemos tus datos ni los compartimos con terceros para sus propios
+    fines. Tus mensajes pasan por el proveedor del servicio de correo
+    electrónico que usamos, que los procesa para entregarlos y guardarlos.
+    También podríamos compartirlos si una autoridad competente lo exige conforme
+    a la ley.
+  </p>
+
+  <h2>Cuánto tiempo los conservamos</h2>
+  <p>
+    El tiempo necesario para atender tu consulta y su seguimiento, y el que
+    exijan las obligaciones legales aplicables. Después los eliminamos.
+  </p>
+
+  <h2>Tus derechos</h2>
+  <p>
+    Puedes acceder a tus datos, rectificarlos, cancelarlos u oponerte a su
+    tratamiento (derechos ARCO), y también retirar tu consentimiento o limitar
+    el uso de tus datos. Para ejercerlos, escríbenos a{' '}
+    <a href={`mailto:${contactEmail}`}>{contactEmail}</a> desde el mismo correo
+    con el que nos contactaste, indica qué derecho quieres ejercer y qué datos
+    involucra. Te responderemos en los plazos que marca la ley.
+  </p>
+  <p>
+    Si consideras que tus derechos no fueron atendidos, puedes acudir a la
+    autoridad competente en materia de protección de datos personales.
+  </p>
+
+  <h2>Consentimiento</h2>
+  <p>
+    Al escribirnos entendemos que aceptas este aviso para las finalidades
+    descritas. Puedes retirar tu consentimiento en cualquier momento escribiendo
+    al mismo correo.
+  </p>
+
+  <h2>Lo que no hacemos en el sitio</h2>
   <ul>
     <li>No usamos analítica ni herramientas de medición.</li>
     <li>No usamos publicidad ni píxeles de seguimiento.</li>
     <li>
-      No incrustamos videos ni botones de redes sociales. El único contenido de
+      No incrustamos videos de terceros ni botones de redes sociales. El video
+      de la portada se sirve desde este mismo sitio. El único contenido de
       terceros es el mapa de Google en la página de sucursales, y solo se carga
       cuando tú pulsas «Ver mapa»: hasta entonces no se contacta a Google.
     </li>
     <li>
-      No cargamos otros recursos de otros dominios: las tipografías y las
-      imágenes se sirven desde este mismo sitio.
+      No cargamos otros recursos de otros dominios: las tipografías, las
+      imágenes y el video se sirven desde este mismo sitio.
     </li>
   </ul>
 
   <h2>Datos técnicos del alojamiento</h2>
   <p>
-    Este sitio se aloja en GitHub Pages. Como ocurre en cualquier servidor web,
-    el proveedor puede registrar datos técnicos de cada visita (por ejemplo, la
-    dirección IP, el navegador y la fecha) con fines de seguridad y
-    funcionamiento. Nosotros no accedemos a esos registros ni los utilizamos.
-    Para ver cómo los trata, consulta la{' '}
+    Este sitio se aloja en GitHub Pages y se publica en soulmatcha.com. Como
+    ocurre en cualquier servidor web, el proveedor puede registrar datos
+    técnicos de cada visita (por ejemplo, la dirección IP, el navegador y la
+    fecha) con fines de seguridad y funcionamiento. Nosotros no accedemos a esos
+    registros ni los utilizamos. Para ver cómo los trata, consulta la{' '}
     <a
       href="https://docs.github.com/es/site-policy/privacy-policies/github-general-privacy-statement"
       rel="noopener noreferrer"
@@ -57,20 +126,16 @@ import { href } from '../i18n';
 
   <h2>Enlaces a otros sitios</h2>
   <p>
-    Cuando agreguemos enlaces a redes sociales u otros sitios, estos tendrán sus
-    propias políticas de privacidad, ajenas a este aviso.
+    Este sitio enlaza a Instagram, Uber Eats y Google Maps. Al abrirlos sales de
+    este sitio y aplican sus propias políticas de privacidad, ajenas a este
+    aviso.
   </p>
 
   <h2>Cambios en este aviso</h2>
   <p>
-    Si el sitio empieza a recopilar datos (por ejemplo, con un formulario de
-    contacto o con analítica), actualizaremos este aviso antes y, cuando
-    corresponda, te pediremos tu consentimiento.
-  </p>
-
-  <h2>Responsable y contacto</h2>
-  <p class="pending">
-    Pendiente: nombre o razón social del responsable y un medio de contacto (por
-    ejemplo, un correo).
+    Si el sitio empieza a recopilar datos por otros medios (por ejemplo, con un
+    formulario de contacto o con analítica), actualizaremos este aviso antes y,
+    cuando corresponda, te pediremos tu consentimiento. La fecha de arriba
+    indica la última revisión.
   </p>
 </LegalLayout>

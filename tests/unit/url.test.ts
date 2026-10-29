@@ -30,4 +30,11 @@ describe('withBase', () => {
     expect(withBase('galeria/', '/')).toBe('/galeria/');
     expect(withBase('', '/')).toBe('/');
   });
+
+  it('con base "/" (dominio propio) no duplica barras', () => {
+    expect(withBase('', '/')).toBe('/');
+    expect(withBase('sucursales/', '/')).toBe('/sucursales/');
+    expect(withBase('/en/', '/')).toBe('/en/');
+    expect(withBase('#nosotros', '/')).toBe('/#nosotros');
+  });
 });

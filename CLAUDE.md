@@ -1,14 +1,15 @@
 # Soul Matcha
 
 Sitio de marca premium (landing) para Soul Matcha. Astro estático + CSS con tokens + TypeScript, en GitHub Pages
-(`/SoulMatcha/`), con migración futura a Vercel. Español en la raíz, inglés en `/en/`.
+con dominio propio `https://soulmatcha.com` (el sitio vive en la raíz, `base` por defecto; ya NO bajo `/SoulMatcha/`),
+con migración futura a Vercel. Español en la raíz, inglés en `/en/`.
 
 Antes de diseñar, leer: [IDENTIDAD-DE-MARCA.md](IDENTIDAD-DE-MARCA.md) (marca, colores, tipografía),
 [PLANEACION.md](PLANEACION.md) (arquitectura, fases) e [INSTALACION.md](INSTALACION.md).
 
 ## Comandos
 
-- `astro dev --background` · `astro dev stop` · `astro dev status` (servidor local en `localhost:4321/SoulMatcha/`)
+- `astro dev --background` · `astro dev stop` · `astro dev status` (servidor local en `localhost:4321/`)
 - `npm run build` · `npm run lint` · `npm run check` · `npm test` (Vitest) · `npm run test:e2e` (Playwright)
 - `npm run icons`: regenera favicon/íconos desde `src/shared/assets/iso.png`
 - **Detener el servidor de desarrollo antes de `test:e2e`**: Playwright reutiliza lo que haya en el puerto 4321 y

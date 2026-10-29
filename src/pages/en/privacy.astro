@@ -1,41 +1,107 @@
 ---
 import { href } from '../../i18n';
 import LegalLayout from '../../layouts/LegalLayout.astro';
+import { contactEmail } from '../../shared/contact';
+
+/*
+ * Privacy notice (English). Keep in sync with src/pages/privacidad.astro. Not reviewed by a lawyer.
+ * Pending from the client: legal name and address of the controller (today only "Soul Matcha").
+ */
 ---
 
 <LegalLayout
   title="Privacy notice"
-  description="How Soul Matcha handles the information of people who visit this site."
-  updated="October 15, 2026"
+  description="How Soul Matcha handles the information of people who visit this site and of people who write to us."
+  updated="October 29, 2026"
   routeKey="privacy"
 >
   <h2>Summary</h2>
   <p>
-    This site is informational. We do not collect personal data: there are no
-    forms, user accounts, purchases or comments.
+    This site is informational. It has no forms, user accounts, purchases or
+    comments, and it does not store personal data about the people who visit it.
+    The only way to contact us is by email: below we explain what happens with
+    the data you send us when you write to us.
   </p>
 
-  <h2>What we do not do</h2>
+  <h2>Data controller</h2>
+  <p>
+    Soul Matcha is the controller of the personal data you send us by email. You
+    can reach us at <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
+  </p>
+
+  <h2>What data we handle</h2>
+  <p>
+    Only what you send us when you write to us: your email address, your name if
+    you include it, and the content of your message. We do not ask for sensitive
+    personal data (for example, health, ethnic origin or religion): please do
+    not include it.
+  </p>
+
+  <h2>What we use it for</h2>
+  <p>
+    To answer your inquiry, for example about wholesale, partnerships or
+    locations, and to follow up on it. We do not use it for advertising or to
+    build profiles.
+  </p>
+
+  <h2>Who we share it with</h2>
+  <p>
+    We do not sell your data or share it with third parties for their own
+    purposes. Your messages go through the email service provider we use, which
+    processes them to deliver and store them. We could also share them if a
+    competent authority requires it under the law.
+  </p>
+
+  <h2>How long we keep it</h2>
+  <p>
+    For as long as needed to handle your inquiry and its follow-up, and as
+    required by applicable legal obligations. After that we delete it.
+  </p>
+
+  <h2>Your rights</h2>
+  <p>
+    You can access your data, rectify it, cancel it or object to its processing
+    (ARCO rights), and you can also withdraw your consent or limit the use of
+    your data. To exercise them, write to us at{' '}
+    <a href={`mailto:${contactEmail}`}>{contactEmail}</a> from the same email
+    address you used to contact us, say which right you want to exercise and
+    which data it involves. We will reply within the deadlines set by law.
+  </p>
+  <p>
+    If you believe your rights were not respected, you can go to the competent
+    data protection authority.
+  </p>
+
+  <h2>Consent</h2>
+  <p>
+    By writing to us we understand that you accept this notice for the purposes
+    described. You can withdraw your consent at any time by writing to the same
+    email address.
+  </p>
+
+  <h2>What we do not do on the site</h2>
   <ul>
     <li>We do not use analytics or measurement tools.</li>
     <li>We do not use advertising or tracking pixels.</li>
     <li>
-      We do not embed videos or social media buttons. The only third-party
-      content is the Google map on the locations page, and it loads only when
-      you press “Show map”: until then, Google is not contacted.
+      We do not embed third-party videos or social media buttons. The video on
+      the home page is served from this same site. The only third-party content
+      is the Google map on the locations page, and it loads only when you press
+      “Show map”: until then, Google is not contacted.
     </li>
     <li>
-      We do not load any other resources from other domains: fonts and images
-      are served from this same site.
+      We do not load any other resources from other domains: fonts, images and
+      video are served from this same site.
     </li>
   </ul>
 
   <h2>Technical data from hosting</h2>
   <p>
-    This site is hosted on GitHub Pages. As with any web server, the host may
-    log technical data about each visit (for example, the IP address, browser
-    and date) for security and operational purposes. We do not access or use
-    those logs. To see how they are handled, read the host's{' '}
+    This site is hosted on GitHub Pages and published at soulmatcha.com. As with
+    any web server, the host may log technical data about each visit (for
+    example, the IP address, browser and date) for security and operational
+    purposes. We do not access or use those logs. To see how they are handled,
+    read the host's{' '}
     <a
       href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
       rel="noopener noreferrer"
@@ -56,20 +122,15 @@ import LegalLayout from '../../layouts/LegalLayout.astro';
 
   <h2>Links to other sites</h2>
   <p>
-    When we add links to social media or other sites, those will have their own
-    privacy policies, separate from this notice.
+    This site links to Instagram, Uber Eats and Google Maps. When you open them
+    you leave this site and their own privacy policies apply, separate from this
+    notice.
   </p>
 
   <h2>Changes to this notice</h2>
   <p>
-    If the site starts to collect data (for example, with a contact form or
-    analytics), we will update this notice beforehand and, where applicable, ask
-    for your consent.
-  </p>
-
-  <h2>Controller and contact</h2>
-  <p class="pending">
-    Pending: name or legal entity of the controller and a contact method (for
-    example, an email address).
+    If the site starts to collect data through other means (for example, a
+    contact form or analytics), we will update this notice beforehand and, where
+    applicable, ask for your consent. The date above shows the latest revision.
   </p>
 </LegalLayout>

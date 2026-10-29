@@ -31,9 +31,9 @@ test('los íconos de pestaña respetan el base y existen', async ({ page }) => {
     .locator('link[rel="icon"], link[rel="apple-touch-icon"]')
     .evaluateAll((els) => els.map((e) => e.getAttribute('href')));
   expect(hrefs).toEqual([
-    '/SoulMatcha/favicon.ico',
-    '/SoulMatcha/icon-192.png',
-    '/SoulMatcha/apple-touch-icon.png',
+    '/favicon.ico',
+    '/icon-192.png',
+    '/apple-touch-icon.png',
   ]);
   for (const href of hrefs) {
     const res = await page.request.get(href!);
@@ -146,7 +146,7 @@ test('el video del hero es mudo, en bucle, sin controles nativos y con póster; 
   );
   // El póster existe y el video también (404 sería un hero vacío).
   for (const url of ['hero/hero-poster.webp', 'hero/hero.mp4']) {
-    const res = await page.request.get(`/SoulMatcha/${url}`);
+    const res = await page.request.get(`/${url}`);
     expect(res.status(), url).toBe(200);
   }
 
@@ -225,7 +225,7 @@ test('los dos botones del hero llevan a Nosotros (rosa) y a la página de sucurs
   const hero = page.locator('section.hero');
   await expect(
     hero.getByRole('link', { name: 'Conoce Soul Matcha' }),
-  ).toHaveAttribute('href', '/SoulMatcha/#nosotros');
+  ).toHaveAttribute('href', '/#nosotros');
   await hero.getByRole('link', { name: 'Ver sucursales' }).click();
   await expect(page).toHaveURL(/\/sucursales\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
@@ -393,10 +393,10 @@ test.describe('versión en inglés', () => {
     const hero = page.locator('section.hero');
     await expect(
       hero.getByRole('link', { name: 'Discover Soul Matcha' }),
-    ).toHaveAttribute('href', '/SoulMatcha/en/#nosotros');
+    ).toHaveAttribute('href', '/en/#nosotros');
     await expect(
       hero.getByRole('link', { name: 'See locations' }),
-    ).toHaveAttribute('href', '/SoulMatcha/en/branches/');
+    ).toHaveAttribute('href', '/en/branches/');
 
     // Buscadores: cada versión apunta a la otra.
     const alternates = await page
@@ -407,9 +407,9 @@ test.describe('versión en inglés', () => {
         ),
       );
     expect(alternates).toEqual([
-      'es https://victordlc97.github.io/SoulMatcha/',
-      'en https://victordlc97.github.io/SoulMatcha/en/',
-      'x-default https://victordlc97.github.io/SoulMatcha/',
+      'es https://soulmatcha.com/',
+      'en https://soulmatcha.com/en/',
+      'x-default https://soulmatcha.com/',
     ]);
   });
 
@@ -465,7 +465,7 @@ test.describe('versión en inglés', () => {
     await expect(footer.getByText('All rights reserved.')).toBeVisible();
     await expect(
       footer.getByRole('link', { name: 'Privacy notice' }),
-    ).toHaveAttribute('href', '/SoulMatcha/en/privacy/');
+    ).toHaveAttribute('href', '/en/privacy/');
   });
 });
 
@@ -821,7 +821,7 @@ test('el mapa del sitio del footer no repite Sucursales, que tiene su propio blo
   // El enlace a las sucursales sigue en el bloque de la derecha.
   await expect(
     footer.getByRole('link', { name: 'Ver ubicaciones' }),
-  ).toHaveAttribute('href', '/SoulMatcha/sucursales/');
+  ).toHaveAttribute('href', '/sucursales/');
 });
 
 test('en escritorio el slogan ocupa el espacio del hero sin chocar con el arco ni con la barra', async ({
@@ -919,5 +919,119 @@ test.describe('hero premium', () => {
     const primary = hero.getByRole('link', { name: 'Conoce Soul Matcha' });
     await expect(primary).toHaveCSS('background-color', 'rgb(88, 79, 50)');
     await expect(primary).toHaveCSS('color', 'rgb(240, 237, 229)');
+  });
+});
+
+test.describe('dominio soulmatcha.com (el sitio vive en la raíz)', () => {
+  test('todos los recursos son rutas desde la raíz y las hojas de estilo cargan (200)', async ({
+    page,
+  }) => {
+    for (const path of ['./', './sucursales/', './wholesale/', './en/']) {
+      await page.goto(path);
+      const urls = await page.evaluate(() =>
+        [
+          ...document.querySelectorAll(
+            'link[href], script[src], img[src], source[src], video[poster]',
+          ),
+        ].map(
+          (el) =>
+            el.getAttribute('href') ??
+            el.getAttribute('src') ??
+            el.getAttribute('poster') ??
+            '',
+        ),
+      );
+      for (const url of urls.filter((u) => u.startsWith('/'))) {
+        expect(url, path).not.toMatch(/^\/SoulMatcha/);
+      }
+      const css = await page
+        .locator('link[rel="stylesheet"]')
+        .evaluateAll((els) => els.map((e) => e.getAttribute('href')!));
+      expect(css.length, path).toBeGreaterThan(0);
+      for (const href of css) {
+        const res = await page.request.get(href);
+        expect(res.status(), href).toBe(200);
+      }
+    }
+  });
+
+  test('el canonical y las alternativas apuntan a soulmatcha.com, nunca a github.io', async ({
+    page,
+  }) => {
+    await page.goto('./sucursales/');
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      'https://soulmatcha.com/sucursales/',
+    );
+    const html = await page.content();
+    expect(html).not.toContain('github.io');
+    expect(html).not.toContain('/SoulMatcha/');
+  });
+});
+
+test.describe('aviso de privacidad', () => {
+  test('en español nombra al responsable, el correo, la finalidad y los derechos ARCO', async ({
+    page,
+  }) => {
+    await page.goto('./privacidad/');
+    const main = page.locator('main');
+    await expect(
+      main.getByRole('heading', { name: 'Responsable del tratamiento' }),
+    ).toBeVisible();
+    await expect(main.getByText('Soul Matcha es responsable')).toBeVisible();
+    await expect(
+      main.getByRole('link', { name: 'cami@soulmatcha.co' }).first(),
+    ).toHaveAttribute('href', 'mailto:cami@soulmatcha.co');
+    for (const h of [
+      'Qué datos tratamos',
+      'Para qué los usamos',
+      'Con quién los compartimos',
+      'Tus derechos',
+    ]) {
+      await expect(main.getByRole('heading', { name: h })).toBeVisible();
+    }
+    await expect(main).toContainText('ARCO');
+    await expect(main).toContainText('Instagram');
+    await expect(main).toContainText('Uber Eats');
+    await expect(main).not.toContainText('Pendiente');
+    await expect(page.locator('.updated')).toContainText(
+      '29 de octubre de 2026',
+    );
+  });
+
+  test('en inglés dice lo mismo', async ({ page }) => {
+    await page.goto('./en/privacy/');
+    const main = page.locator('main');
+    await expect(
+      main.getByRole('heading', { name: 'Data controller' }),
+    ).toBeVisible();
+    await expect(main.getByText('Soul Matcha is the controller')).toBeVisible();
+    await expect(
+      main.getByRole('link', { name: 'cami@soulmatcha.co' }).first(),
+    ).toHaveAttribute('href', 'mailto:cami@soulmatcha.co');
+    for (const h of [
+      'What data we handle',
+      'What we use it for',
+      'Who we share it with',
+      'Your rights',
+    ]) {
+      await expect(main.getByRole('heading', { name: h })).toBeVisible();
+    }
+    await expect(main).toContainText('ARCO');
+    await expect(main).not.toContainText('Pending');
+    await expect(page.locator('.updated')).toContainText('October 29, 2026');
+  });
+
+  test('declara que el sitio no guarda datos y que todo contacto es por correo', async ({
+    page,
+  }) => {
+    await page.goto('./privacidad/');
+    await expect(page.locator('main')).toContainText('correo electrónico');
+    await expect(page.locator('main')).toContainText('No tiene formularios');
+    // Coherente con el sitio real: no hay formularios ni campos de entrada.
+    await expect(page.locator('form')).toHaveCount(0);
+    await expect(
+      page.locator('input:not([type="hidden"]), textarea'),
+    ).toHaveCount(0);
   });
 });
