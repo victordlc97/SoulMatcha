@@ -1176,3 +1176,34 @@ test.describe('carga rápida en celular', () => {
     ).toBeVisible();
   });
 });
+
+test.describe('menú de Roma Norte (/menuroma)', () => {
+  test('el PDF se sirve como PDF desde /menus/roma.pdf', async ({ page }) => {
+    const res = await page.request.get('/menus/roma.pdf');
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type']).toContain('application/pdf');
+    const body = await res.body();
+    expect(body.subarray(0, 4).toString()).toBe('%PDF');
+    expect(body.length).toBeGreaterThan(100_000);
+  });
+
+  test('/menuroma lleva al PDF: redirige al instante y deja un enlace de respaldo', async ({
+    page,
+  }) => {
+    const res = await page.request.get('/menuroma/');
+    expect(res.status()).toBe(200);
+    const html = await res.text();
+    expect(html).toMatch(/http-equiv="refresh"[^>]*url=\/menus\/roma\.pdf/);
+    expect(html).toContain('location.replace');
+    expect(html).toContain('href="/menus/roma.pdf"');
+    expect(html).toMatch(/<meta name="robots" content="noindex/);
+  });
+
+  test('sin barra final también responde (así lo escribe quien teclea o imprime el QR)', async ({
+    page,
+  }) => {
+    const res = await page.request.get('/menuroma');
+    expect(res.status()).toBe(200);
+    expect(await res.text()).toContain('/menus/roma.pdf');
+  });
+});

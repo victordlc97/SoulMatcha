@@ -1,0 +1,53 @@
+---
+import '../styles/global.css';
+import { withBase } from '../shared/url';
+
+/*
+ * /menuroma: dirección corta para el código QR del menú de la sucursal Roma Norte.
+ * GitHub Pages no puede servir un PDF en una ruta sin extensión (lo mandaría como descarga), así que el
+ * PDF vive en /menus/roma.pdf (public/menus/roma.pdf) y esta página redirige a él al instante: quien
+ * escanea el QR cae directo en el visor de PDF de su teléfono. Sin JavaScript queda el meta refresh, y
+ * si tampoco funciona, el enlace visible. Para otra sucursal: public/menus/<sucursal>.pdf + una página igual.
+ * Para actualizar el menú: reemplazar public/menus/roma.pdf conservando el nombre (la dirección no cambia).
+ */
+const pdf = withBase('menus/roma.pdf');
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Menú Roma Norte | Soul Matcha</title>
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content={`0; url=${pdf}`} />
+    <link rel="icon" href={withBase('favicon.ico')} sizes="32x32" />
+    <link
+      rel="icon"
+      href={withBase('icon-192.png')}
+      type="image/png"
+      sizes="192x192"
+    />
+    <script is:inline define:vars={{ pdf }}>
+      location.replace(pdf);
+    </script>
+  </head>
+  <body>
+    <main class="container">
+      <p>
+        Abriendo el menú de Roma Norte… <a href={pdf}>Abrir el menú (PDF)</a>
+      </p>
+      <p lang="en">
+        Opening the Roma Norte menu… <a href={pdf}>Open the menu (PDF)</a>
+      </p>
+    </main>
+  </body>
+</html>
+
+<style>
+  main {
+    display: grid;
+    gap: var(--space-4);
+    padding-block: var(--space-24);
+  }
+</style>
