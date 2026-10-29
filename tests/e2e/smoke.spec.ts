@@ -7,7 +7,7 @@ test('la portada carga con el lienzo crema y el enlace de salto', async ({
   await page.goto('./');
   await expect(page).toHaveTitle('Soul Matcha');
   await expect(page.getByRole('heading', { level: 1 })).toContainText(
-    'Life is better with',
+    'I love you so',
   );
 
   const bg = await page.evaluate(
@@ -63,7 +63,7 @@ test('el header flota con vidrio y reparte la navegación a ambos lados del logo
   expect(hasBlur).toContain('blur');
 });
 
-test('el header usa cristal oscuro sobre el hero y claro sobre crema y sobre el footer rosa', async ({
+test('el header usa cristal oscuro sobre el hero y la misión, y claro sobre crema', async ({
   page,
 }) => {
   await page.goto('./');
@@ -95,10 +95,21 @@ test('el header usa cristal oscuro sobre el hero y claro sobre crema y sobre el 
   );
   await expect(page.locator('.site-header .on-dark')).toHaveCSS('opacity', '0');
 
-  // Sobre el footer (rosa, claro): sigue el cristal claro con texto café.
+  // Entre "Nosotros" y la banda de misión (café) el cristal sigue claro; al llegar a la banda, oscuro.
+  await page.evaluate(() =>
+    window.scrollTo(
+      0,
+      document.querySelector<HTMLElement>('.mission')!.offsetTop,
+    ),
+  );
+  await expect(header).toHaveAttribute('data-surface', 'dark');
+  await expect(link).toHaveCSS('color', 'rgb(240, 237, 229)');
+
+  // Al final de la página la banda de misión se mete bajo las esquinas redondeadas del footer y
+  // sigue tocando la barra: el cristal queda oscuro (texto crema), legible sobre café y sobre rosa.
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-  await expect(header).toHaveAttribute('data-surface', 'light');
-  await expect(link).toHaveCSS('color', 'rgb(88, 79, 50)');
+  await expect(header).toHaveAttribute('data-surface', 'dark');
+  await expect(link).toHaveCSS('color', 'rgb(240, 237, 229)');
 });
 
 test('el footer iguala el rosa del logo y usa texto blanco', async ({
@@ -120,15 +131,24 @@ test('el hero ocupa la pantalla completa', async ({ page }) => {
   expect(hero!.height).toBeGreaterThanOrEqual(viewport.height - 1);
 });
 
-test('la foto del hero y el logo del footer cargan de verdad', async ({
+test('el video del hero es mudo, en bucle, sin controles nativos y con póster; el logo del footer carga', async ({
   page,
 }) => {
   await page.goto('./');
-  const hero = page.locator('section.hero img');
-  await expect(hero).toHaveAttribute('fetchpriority', 'high');
-  await expect
-    .poll(() => hero.evaluate((el: HTMLImageElement) => el.naturalWidth))
-    .toBeGreaterThan(0);
+  const video = page.locator('section.hero video');
+  await expect(video).toHaveJSProperty('muted', true);
+  await expect(video).toHaveJSProperty('loop', true);
+  await expect(video).toHaveAttribute('playsinline', '');
+  await expect(video).toHaveAttribute('poster', /\/hero\/hero-poster\.webp$/);
+  await expect(video.locator('source')).toHaveAttribute(
+    'src',
+    /\/hero\/hero\.mp4$/,
+  );
+  // El póster existe y el video también (404 sería un hero vacío).
+  for (const url of ['hero/hero-poster.webp', 'hero/hero.mp4']) {
+    const res = await page.request.get(`/SoulMatcha/${url}`);
+    expect(res.status(), url).toBe(200);
+  }
 
   const logo = page.getByRole('contentinfo').getByRole('img', {
     name: 'Soul matcha',
@@ -137,6 +157,40 @@ test('la foto del hero y el logo del footer cargan de verdad', async ({
   await expect
     .poll(() => logo.evaluate((el: HTMLImageElement) => el.naturalWidth))
     .toBeGreaterThan(0);
+});
+
+test('con movimiento reducido el video no arranca solo y el botón permite reproducirlo', async ({
+  browser,
+}) => {
+  const context = await browser.newContext({ reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  await page.goto('./');
+  const video = page.locator('section.hero video');
+  const toggle = page.getByRole('button', { name: 'Reproducir video' });
+  await expect(toggle).toBeVisible();
+  await expect(video).toHaveJSProperty('paused', true);
+  await context.close();
+});
+
+test('el botón del hero ofrece pausar el video y volver a reproducirlo (WCAG 2.2.2)', async ({
+  page,
+}) => {
+  await page.goto('./');
+  const video = page.locator('section.hero video');
+  const pause = page.getByRole('button', { name: 'Pausar video' });
+  // El video arranca solo (mudo): el botón ofrece pausarlo.
+  await expect(pause).toBeVisible();
+  await expect
+    .poll(() => video.evaluate((v: HTMLVideoElement) => v.paused))
+    .toBe(false);
+
+  await pause.click();
+  await expect(video).toHaveJSProperty('paused', true);
+  const play = page.getByRole('button', { name: 'Reproducir video' });
+  await expect(play).toBeVisible();
+
+  await play.click();
+  await expect(video).toHaveJSProperty('paused', false);
 });
 
 test('el footer tiene legal, mapa del sitio y espacio para el logo', async ({
@@ -164,14 +218,14 @@ test('no hay desbordamiento horizontal en móvil', async ({ page }) => {
   expect(overflow).toBeLessThanOrEqual(0);
 });
 
-test('los dos botones del hero llevan a la galería (rosa) y a la página de sucursales', async ({
+test('los dos botones del hero llevan a Nosotros (rosa) y a la página de sucursales', async ({
   page,
 }) => {
   await page.goto('./');
   const hero = page.locator('section.hero');
   await expect(
     hero.getByRole('link', { name: 'Conoce Soul Matcha' }),
-  ).toHaveAttribute('href', '/SoulMatcha/#producto');
+  ).toHaveAttribute('href', '/SoulMatcha/#nosotros');
   await hero.getByRole('link', { name: 'Ver sucursales' }).click();
   await expect(page).toHaveURL(/\/sucursales\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
@@ -328,7 +382,7 @@ test.describe('versión en inglés', () => {
     await page.goto('./en/');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Life is better with',
+      'I love you so',
     );
 
     const nav = page.getByRole('navigation', { name: 'Main' });
@@ -339,7 +393,7 @@ test.describe('versión en inglés', () => {
     const hero = page.locator('section.hero');
     await expect(
       hero.getByRole('link', { name: 'Discover Soul Matcha' }),
-    ).toHaveAttribute('href', '/SoulMatcha/en/#producto');
+    ).toHaveAttribute('href', '/SoulMatcha/en/#nosotros');
     await expect(
       hero.getByRole('link', { name: 'See locations' }),
     ).toHaveAttribute('href', '/SoulMatcha/en/branches/');
@@ -421,7 +475,12 @@ test.describe('sucursales', () => {
   }) => {
     await page.goto('./sucursales/');
     const tabs = page.getByRole('tab');
-    await expect(tabs).toHaveText(['Roma Norte', 'Monte Athos', 'Cancún']);
+    await expect(tabs).toHaveText([
+      'Roma Norte',
+      'Lomas de Chapultepec',
+      'Anima Village Los Cabos',
+      'Cancún',
+    ]);
     await expect(tabs.first()).toHaveAttribute('aria-selected', 'true');
     await expect(page.getByText('Tabasco 151')).toBeVisible();
     await expect(page.getByText('Monte Athos 130')).toBeHidden();
@@ -431,6 +490,12 @@ test.describe('sucursales', () => {
     await expect(page.getByText('Tabasco 151')).toBeHidden();
 
     await tabs.nth(2).click();
+    await expect(
+      page.getByText('Dentro de la plaza Anima Village'),
+    ).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Ver mapa' })).toBeVisible();
+
+    await tabs.nth(3).click();
     await expect(page.getByText('Próxima apertura')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Ver mapa' })).toBeHidden();
   });
@@ -444,10 +509,9 @@ test.describe('sucursales', () => {
     const first = page.getByRole('tab').first();
     await first.focus();
     await page.keyboard.press('ArrowRight');
-    await expect(page.getByRole('tab', { name: 'Monte Athos' })).toBeFocused();
-    await expect(
-      page.getByRole('tab', { name: 'Monte Athos' }),
-    ).toHaveAttribute('aria-selected', 'true');
+    const lomas = page.getByRole('tab', { name: 'Lomas de Chapultepec' });
+    await expect(lomas).toBeFocused();
+    await expect(lomas).toHaveAttribute('aria-selected', 'true');
     await page.keyboard.press('End');
     await expect(page.getByRole('tab', { name: 'Cancún' })).toBeFocused();
   });
@@ -484,10 +548,30 @@ test.describe('sucursales', () => {
     await expect(
       page.getByRole('link', { name: 'Abrir en Google Maps' }).first(),
     ).toHaveAttribute('href', 'https://maps.app.goo.gl/s1cHzrmcoWVeWFN57');
-    await page.getByRole('tab', { name: 'Monte Athos' }).click();
+    await page.getByRole('tab', { name: 'Lomas de Chapultepec' }).click();
     await expect(
       page.getByRole('link', { name: 'Abrir en Google Maps' }).first(),
     ).toHaveAttribute('href', 'https://maps.app.goo.gl/kRCnGnks8XAHm8Sh6');
+    await page.getByRole('tab', { name: 'Anima Village Los Cabos' }).click();
+    await expect(
+      page.getByRole('link', { name: 'Abrir en Google Maps' }).first(),
+    ).toHaveAttribute('href', 'https://maps.app.goo.gl/M9Ak4akvjXmZF6SU6');
+  });
+
+  test('cada sucursal con horario lo muestra', async ({ page }) => {
+    await page.goto('./sucursales/');
+    const panel = page.getByRole('tabpanel');
+    await expect(panel.getByText('Lunes a jueves')).toBeVisible();
+    await expect(panel.getByText('9:30 am – 6:30 pm')).toBeVisible();
+    await expect(panel.getByText('Viernes a domingo')).toBeVisible();
+    await expect(panel.getByText('10:00 am – 7:00 pm')).toBeVisible();
+
+    await page.getByRole('tab', { name: 'Lomas de Chapultepec' }).click();
+    await expect(panel.getByText('Lunes a domingo')).toBeVisible();
+
+    // Los Cabos aún no tiene horario confirmado: no se inventa uno.
+    await page.getByRole('tab', { name: 'Anima Village Los Cabos' }).click();
+    await expect(page.getByRole('heading', { name: 'Horario' })).toBeHidden();
   });
 
   test('en inglés las pestañas y los textos están traducidos', async ({
@@ -497,33 +581,108 @@ test.describe('sucursales', () => {
     await expect(
       page.getByRole('tablist', { name: 'Choose a location' }),
     ).toBeVisible();
+    await expect(page.getByText('Monday to Thursday')).toBeVisible();
     await page.getByRole('tab', { name: 'Cancún' }).click();
     await expect(page.getByText('Opening soon')).toBeVisible();
   });
 });
 
-test.describe('galería', () => {
-  test('Producto y Proceso muestran fotos reales que cargan', async ({
+test.describe('fotos integradas en las secciones', () => {
+  test('el orden de la página es Nosotros, Origen, Producto y Misión (sin galería suelta)', async ({
     page,
   }) => {
     await page.goto('./');
-    const product = page.locator('#producto');
-    const imgs = product.locator('img');
-    expect(await imgs.count()).toBeGreaterThanOrEqual(10);
-    await imgs.first().scrollIntoViewIfNeeded();
-    await expect
-      .poll(() =>
-        imgs.first().evaluate((el: HTMLImageElement) => el.naturalWidth),
-      )
-      .toBeGreaterThan(0);
-    await expect(
-      product.getByRole('heading', { name: 'Proceso' }),
-    ).toBeVisible();
+    const tops = await page.evaluate(() =>
+      ['#nosotros', '#origen', '#producto', '.mission'].map(
+        (sel) => (document.querySelector(sel) as HTMLElement).offsetTop,
+      ),
+    );
+    expect([...tops].sort((a, b) => a - b)).toEqual(tops);
+    await expect(page.locator('main > section')).toHaveCount(5); // hero + 4
+  });
+
+  test('Producto y Origen muestran carriles de fotos reales que cargan', async ({
+    page,
+  }) => {
+    await page.goto('./');
+    for (const [id, min] of [
+      ['#producto', 8],
+      ['#origen', 8],
+    ] as const) {
+      const imgs = page.locator(`${id} [data-lightbox] img`);
+      expect(await imgs.count(), id).toBeGreaterThanOrEqual(min);
+      await imgs.first().scrollIntoViewIfNeeded();
+      await expect
+        .poll(() =>
+          imgs.first().evaluate((el: HTMLImageElement) => el.naturalWidth),
+        )
+        .toBeGreaterThan(0);
+    }
   });
 
   test('Nosotros muestra sus dos fotos', async ({ page }) => {
     await page.goto('./');
     await expect(page.locator('#nosotros img')).toHaveCount(2);
+  });
+
+  test('los botones del carril lo desplazan', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('./');
+    const rail = page.locator('#producto [data-rail]');
+    await rail.scrollIntoViewIfNeeded();
+    const track = rail.locator('[data-rail-track]');
+    const next = rail.getByRole('button', { name: 'Ver más fotos' });
+    const prev = rail.getByRole('button', { name: 'Ver fotos anteriores' });
+    await expect(prev).toBeDisabled();
+    await next.click();
+    await expect
+      .poll(() => track.evaluate((el) => el.scrollLeft))
+      .toBeGreaterThan(100);
+    await expect(prev).toBeEnabled();
+  });
+
+  test('al pasar el mouse por una foto, las demás se atenúan', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('./');
+    const photos = page.locator('#producto [data-lightbox]');
+    await photos.nth(1).scrollIntoViewIfNeeded();
+    const li = (n: number) => photos.nth(n).locator('xpath=ancestor::li');
+    await expect(li(0)).toHaveCSS('opacity', '1');
+    await photos.nth(1).hover();
+    await expect(li(1)).toHaveCSS('opacity', '1');
+    await expect(li(0)).toHaveCSS('opacity', '0.5');
+    await expect(li(2)).toHaveCSS('opacity', '0.5');
+    // El icono de ampliar aparece solo en la foto elegida.
+    await expect(photos.nth(1).locator('.zoom')).toHaveCSS('opacity', '1');
+    await expect(photos.nth(0).locator('.zoom')).toHaveCSS('opacity', '0');
+  });
+
+  test('un clic amplía la foto, las flechas recorren el grupo y Esc devuelve el foco', async ({
+    page,
+    browserName,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('./');
+    const photos = page.locator('#producto [data-lightbox]');
+    await photos.nth(1).scrollIntoViewIfNeeded();
+    await photos.nth(1).click();
+
+    const dialog = page.getByRole('dialog', { name: 'Foto ampliada' });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText('2 / 8')).toBeVisible();
+    await expect(dialog.locator('img')).toHaveAttribute('src', /_image|_astro/);
+
+    await dialog.getByRole('button', { name: 'Foto siguiente' }).click();
+    await expect(dialog.getByText('3 / 8')).toBeVisible();
+    await page.keyboard.press('ArrowLeft');
+    await expect(dialog.getByText('2 / 8')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    // Safari no devuelve el foco con clic en botones (ver CLAUDE.md).
+    if (browserName !== 'webkit') await expect(photos.nth(1)).toBeFocused();
   });
 });
 
@@ -551,4 +710,214 @@ test('el logo del header deja holgura dentro de la barra', async ({ page }) => {
   const logo = (await page.locator('nav.bar .brand .header').boundingBox())!;
   expect(logo.y - bar.y).toBeGreaterThanOrEqual(6);
   expect(bar.y + bar.height - (logo.y + logo.height)).toBeGreaterThanOrEqual(6);
+});
+
+test.describe('contenido del deck de mayoreo', () => {
+  test('el slogan del hero es "I love you so matcha" y no se pega al leerlo', async ({
+    page,
+  }) => {
+    await page.goto('./');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'I love you so matcha',
+    );
+    // El texto accesible conserva los espacios entre renglones.
+    const text = await page
+      .locator('#hero-title')
+      .evaluate((el) => el.textContent?.replace(/\s+/g, ' ').trim());
+    expect(text).toBe('I love you so matcha');
+  });
+
+  test('la portada cuenta el origen del matcha y la misión, con texto real', async ({
+    page,
+  }) => {
+    await page.goto('./');
+    const origin = page.locator('#origen');
+    await expect(
+      origin.getByRole('heading', { name: '¿De dónde viene nuestro matcha?' }),
+    ).toBeVisible();
+    await expect(origin.getByText('Uji, Japón').first()).toBeVisible();
+
+    const about = page.locator('#nosotros');
+    await expect(about.getByText('casa de matcha refinada')).toBeVisible();
+    await expect(page.locator('body')).not.toContainText(
+      'pendiente de contenido',
+    );
+
+    await expect(page.locator('.mission')).toContainText(
+      'hacer el matcha accesible',
+    );
+  });
+
+  test('el header cambia a cristal oscuro sobre la sección de origen', async ({
+    page,
+  }) => {
+    await page.goto('./');
+    await page.evaluate(() =>
+      window.scrollTo(0, document.getElementById('origen')!.offsetTop + 100),
+    );
+    await expect(page.locator('.site-header')).toHaveAttribute(
+      'data-surface',
+      'dark',
+    );
+  });
+
+  test('Wholesale está en el menú, abre su página y muestra el correo de contacto', async ({
+    page,
+  }) => {
+    await page.goto('./');
+    await page
+      .getByRole('navigation', { name: 'Principal' })
+      .getByRole('link', { name: 'Wholesale' })
+      .click();
+    await expect(page).toHaveURL(/\/wholesale\/$/);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'Wholesale y alianzas',
+    );
+    await expect(
+      page.getByRole('link', { name: 'cami@soulmatcha.co' }),
+    ).toHaveAttribute('href', 'mailto:cami@soulmatcha.co');
+    await expect(page.getByText('5 kilogramos')).toBeVisible();
+  });
+
+  test('Wholesale existe en inglés y el selector de idioma lleva a la misma página', async ({
+    page,
+  }) => {
+    await page.goto('./wholesale/');
+    await page
+      .getByRole('navigation', { name: 'Principal' })
+      .getByRole('link', { name: 'Read this site in English' })
+      .click();
+    await expect(page).toHaveURL(/\/en\/wholesale\/$/);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'Wholesale and partnerships',
+    );
+    await expect(page.getByText('5 kilograms')).toBeVisible();
+  });
+
+  test('ninguna página publica precios (la lista de precios del deck se omitió)', async ({
+    page,
+  }) => {
+    for (const path of ['./', './wholesale/', './en/', './en/wholesale/']) {
+      await page.goto(path);
+      const text = await page.locator('body').innerText();
+      expect(text, path).not.toMatch(/\$\s?\d|\d\s?(MXN|USD|pesos)/i);
+      expect(text, path).not.toMatch(/priced|más caro|precio/i);
+    }
+  });
+});
+
+test('el mapa del sitio del footer no repite Sucursales, que tiene su propio bloque', async ({
+  page,
+}) => {
+  await page.goto('./');
+  const footer = page.getByRole('contentinfo');
+  const sitemap = footer.getByRole('navigation', { name: 'Mapa del sitio' });
+  await expect(sitemap.getByRole('link')).toHaveText([
+    'Inicio',
+    'Nosotros',
+    'Producto',
+    'Wholesale',
+  ]);
+  // El enlace a las sucursales sigue en el bloque de la derecha.
+  await expect(
+    footer.getByRole('link', { name: 'Ver ubicaciones' }),
+  ).toHaveAttribute('href', '/SoulMatcha/sucursales/');
+});
+
+test('en escritorio el slogan ocupa el espacio del hero sin chocar con el arco ni con la barra', async ({
+  page,
+}) => {
+  for (const [width, height] of [
+    [1024, 768],
+    [1280, 720],
+    [1440, 900],
+    [1920, 1080],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('./');
+    const slogan = (await page.locator('.slogan').boundingBox())!;
+    const arch = (await page.locator('section.hero .media').boundingBox())!;
+    const bar = (await page.locator('nav.bar').boundingBox())!;
+    const label = `${width}x${height}`;
+    // Respeta al menos 24 px de aire frente al arco y no sube hasta la barra.
+    expect(slogan.x + slogan.width, label).toBeLessThanOrEqual(arch.x - 24);
+    expect(slogan.y, label).toBeGreaterThanOrEqual(bar.y + bar.height + 16);
+    // Y aprovecha el espacio: el renglón más ancho ("MATCHA") llena buena parte de la columna.
+    const free = arch.x - slogan.x - 24;
+    expect(slogan.width, label).toBeGreaterThan(free * 0.45);
+  }
+});
+
+test.describe('hero premium', () => {
+  test('el slogan entra por renglones tras la pantalla de carga y termina visible', async ({
+    page,
+  }) => {
+    await page.goto('./');
+    await expect(page.locator('html')).toHaveAttribute('data-loader', 'done', {
+      timeout: 8000,
+    });
+    const spans = page.locator('.slogan span');
+    // Cada renglón tiene su animación (escalonada)…
+    const names = await spans.evaluateAll((els) =>
+      els.map((el) => getComputedStyle(el).animationName),
+    );
+    for (const name of names) expect(name).not.toBe('none');
+    const delays = await spans.evaluateAll((els) =>
+      els.map((el) => parseFloat(getComputedStyle(el).animationDelay)),
+    );
+    expect(delays[0]).toBeLessThan(delays[1]);
+    expect(delays[1]).toBeLessThan(delays[2]);
+    // …y al terminar todo se ve.
+    for (const i of [0, 1, 2]) {
+      await expect(spans.nth(i)).toHaveCSS('opacity', '1', { timeout: 4000 });
+    }
+  });
+
+  test('con movimiento reducido no hay animación de entrada y el slogan se ve de inmediato', async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({ reducedMotion: 'reduce' });
+    const page = await context.newPage();
+    await page.goto('./');
+    const spans = page.locator('.slogan span');
+    for (const i of [0, 1, 2]) {
+      await expect(spans.nth(i)).toHaveCSS('animation-name', 'none');
+      await expect(spans.nth(i)).toHaveCSS('opacity', '1');
+    }
+    await context.close();
+  });
+
+  test('los tres renglones del slogan quedan alineados a la izquierda (sin sangría)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('./');
+    const xs = await page
+      .locator('.slogan span')
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().x));
+    expect(Math.max(...xs) - Math.min(...xs)).toBeLessThanOrEqual(1);
+  });
+
+  test('no hay arco de línea detrás del video', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('./');
+    await expect(page.locator('section.hero .ring')).toHaveCount(0);
+  });
+
+  test('prueba de color pedida: hero rosa con slogan blanco y botones legibles', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('./');
+    const hero = page.locator('section.hero');
+    await expect(hero).toHaveCSS('background-color', 'rgb(220, 178, 188)');
+    await expect(page.locator('.slogan')).toHaveCSS(
+      'color',
+      'rgb(255, 255, 255)',
+    );
+    // El botón principal no puede ser rosa sobre rosa: va en café con texto crema.
+    const primary = hero.getByRole('link', { name: 'Conoce Soul Matcha' });
+    await expect(primary).toHaveCSS('background-color', 'rgb(88, 79, 50)');
+    await expect(primary).toHaveCSS('color', 'rgb(240, 237, 229)');
+  });
 });

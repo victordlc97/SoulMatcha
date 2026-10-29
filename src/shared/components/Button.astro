@@ -5,8 +5,9 @@ interface Props {
    * `primary`: relleno matcha (acción).
    * `rose`: relleno rosa del footer con texto café profundo (5.2:1).
    * `secondary`: contorno claro, para fondos oscuros.
+   * `ink`: café sólido con texto crema (7:1), para fondos rosas o claros donde `rose` no se ve.
    */
-  variant?: 'primary' | 'rose' | 'secondary';
+  variant?: 'primary' | 'rose' | 'secondary' | 'ink';
   /** `sm`: compacto (hero). */
   size?: 'md' | 'sm';
 }
@@ -54,6 +55,11 @@ const { href, variant = 'primary', size = 'md' } = Astro.props;
   .rose {
     background: var(--surface-footer);
     color: var(--text-on-rose);
+  }
+
+  .ink {
+    background: var(--surface-inverse);
+    color: var(--text-inverse);
   }
 
   .secondary {

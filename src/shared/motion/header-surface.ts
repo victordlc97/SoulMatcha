@@ -60,4 +60,8 @@ export function initHeaderSurface(): void {
   observe();
   // La altura de la barra cambia entre móvil y escritorio.
   window.addEventListener('resize', observe);
+  // WebKit puede ejecutar este script antes de aplicar el CSS y medir la barra fuera de lugar (el margen
+  // quedaba en 0 y todo el viewport contaba como "tocando la barra"). Cuando el CSS llega, la barra
+  // cambia de tamaño: ahí se vuelve a medir. Es más fiable que esperar a `load`, que tarda más.
+  if ('ResizeObserver' in window) new ResizeObserver(observe).observe(bar);
 }

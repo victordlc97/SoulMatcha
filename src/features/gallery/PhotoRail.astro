@@ -1,0 +1,165 @@
+---
+import { getLocale, useTranslations } from '../../i18n';
+import { galleryImages, type GalleryCategory } from './gallery';
+import Photo from './Photo.astro';
+
+interface Props {
+  category: GalleryCategory;
+}
+
+const { category } = Astro.props;
+const t = useTranslations(getLocale(Astro));
+const alt = t.gallery[category];
+const images = galleryImages(category);
+---
+
+<!--
+  CARRIL DE FOTOS de una categoría, a sangre hasta el borde de la pantalla. La primera foto se alinea
+  con el contenedor (--rail-inset). Crece solo: cada foto nueva en gallery/<categoría>/ se suma al
+  final, sin tocar código ni acomodar filas. Desplazamiento nativo con scroll-snap; con JavaScript
+  se suman los botones y el visor ampliado.
+-->
+<div class="rail" data-rail>
+  <div class="container controls" data-rail-controls hidden>
+    <button
+      type="button"
+      class="step"
+      data-rail-prev
+      aria-label={t.gallery.railPrev}
+    >
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path
+          d="M15 5l-7 7 7 7"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        ></path>
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="step"
+      data-rail-next
+      aria-label={t.gallery.railNext}
+    >
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path
+          d="M9 5l7 7-7 7"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        ></path>
+      </svg>
+    </button>
+  </div>
+
+  <ul class="track" data-rail-track aria-label={alt}>
+    {images.map((image, i) => (
+      <li>
+        <Photo
+          image={image}
+          alt={alt}
+          group={category}
+          position={[i + 1, images.length]}
+        />
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .rail {
+    /* La primera foto arranca donde arranca el contenedor; el ancho es el de este bloque (sin la
+       barra de desplazamiento de la página). */
+    --rail-inset: max(
+      var(--gutter),
+      calc((100% - var(--container-max)) / 2 + var(--gutter))
+    );
+  }
+
+  .controls {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: flex-end;
+    margin-block-end: var(--space-4);
+  }
+
+  .controls[hidden] {
+    display: none;
+  }
+
+  .step {
+    display: grid;
+    place-items: center;
+    inline-size: var(--tap-target);
+    block-size: var(--tap-target);
+    padding: 0;
+    border: 1px solid currentcolor;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) var(--ease-out-soft),
+      opacity var(--duration-fast) var(--ease-out-soft);
+  }
+
+  .step:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .step:hover:not(:disabled) {
+    background: var(--hover-tint);
+  }
+
+  .track {
+    display: flex;
+    gap: var(--space-4);
+    margin: 0;
+    padding: var(--space-2) var(--rail-inset);
+    overflow-x: auto;
+    list-style: none;
+    scroll-padding-inline: var(--rail-inset);
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+
+  .track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .track li {
+    flex: 0 0 min(72vw, 17rem);
+    scroll-snap-align: start;
+    transition: opacity var(--duration-base) var(--ease-out-soft);
+  }
+
+  /* Al pasar el mouse por una foto, las demás se atenúan: la mirada se queda en la que se eligió. */
+  @media (hover: hover) {
+    .track:has(:global([data-lightbox]:hover))
+      li:not(:has(:global([data-lightbox]:hover))) {
+      opacity: 0.5;
+    }
+  }
+
+  @media (width >= 48rem) {
+    .track {
+      gap: var(--space-6);
+    }
+
+    .track li {
+      flex-basis: 19rem;
+    }
+  }
+</style>
+
+<script>
+  import { initRails } from './rail';
+
+  initRails();
+</script>

@@ -1,0 +1,44 @@
+---
+import { getLocale, useTranslations } from '../../i18n';
+
+const t = useTranslations(getLocale(Astro));
+---
+
+<!-- Banda de misión (pág. 7 del deck): una sola frase, en grande, sobre café. -->
+<section class="mission" data-header-surface="dark">
+  <div class="container">
+    <p class="statement">{t.mission.text}</p>
+  </div>
+</section>
+
+<style>
+  .mission {
+    padding-block: var(--space-24);
+
+    /* El footer redondea sus esquinas superiores: la banda se mete debajo para que ahí se vea
+       café y no el lienzo crema. */
+    padding-block-end: calc(var(--space-24) + var(--radius-lg));
+    margin-block-end: calc(var(--radius-lg) * -1);
+    background: var(--surface-inverse);
+    color: var(--text-blush-on-inverse);
+  }
+
+  .statement {
+    max-inline-size: 22ch;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    line-height: var(--leading-tight);
+    letter-spacing: 0.01em;
+  }
+
+  @media (width >= 48rem) {
+    .mission {
+      padding-block: var(--space-32);
+      padding-block-end: calc(var(--space-32) + var(--radius-lg));
+    }
+
+    .statement {
+      font-size: var(--text-5xl);
+    }
+  }
+</style>

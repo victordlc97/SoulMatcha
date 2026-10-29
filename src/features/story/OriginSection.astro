@@ -1,0 +1,123 @@
+---
+import { Image } from 'astro:assets';
+import { getLocale, useTranslations } from '../../i18n';
+import PhotoRail from '../gallery/PhotoRail.astro';
+import leaves from './origin-leaves.jpg';
+
+const t = useTranslations(getLocale(Astro));
+---
+
+<!--
+  SECCIÓN "ORIGEN" (pág. 4–6 del deck de mayoreo): de dónde viene el matcha.
+  Fondo de hojas con degradado oscuro: el texto crema/rosa cumple contraste sobre cualquier zona.
+  Se omitió a propósito la frase del deck que habla de que los productos cuestan más que el mercado.
+-->
+<section
+  id="origen"
+  class="origin"
+  aria-labelledby="origin-title"
+  data-header-surface="dark"
+>
+  <Image
+    class="bg"
+    src={leaves}
+    alt=""
+    format="webp"
+    widths={[800, 1200, 1800, 2400]}
+    sizes="100vw"
+    loading="lazy"
+  />
+
+  <div class="container content">
+    <h2 id="origin-title" class="question">
+      {t.origin.title}
+    </h2>
+    <p class="lead">{t.origin.lead}</p>
+
+    <div class="columns">
+      <p>{t.origin.quality}</p>
+      <p>{t.origin.craft}</p>
+      <p>{t.origin.farmers}</p>
+    </div>
+  </div>
+
+  <div class="photos">
+    <PhotoRail category="proceso" />
+  </div>
+</section>
+
+<style>
+  .origin {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: var(--space-24);
+    background: var(--surface-inverse);
+    color: var(--text-inverse);
+    scroll-margin-block-start: var(--space-16);
+  }
+
+  .bg {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  /* Degradado de legibilidad: el café de marca ensucia el verde, por eso va el tinte neutro. */
+  .origin::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: color-mix(in srgb, var(--scrim-ink) 82%, transparent);
+  }
+
+  .content {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .question {
+    max-inline-size: 18ch;
+    color: var(--text-blush-on-inverse);
+    font-size: var(--text-3xl);
+    line-height: var(--leading-tight);
+  }
+
+  .lead {
+    max-inline-size: 40ch;
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+  }
+
+  .columns {
+    display: grid;
+    gap: var(--space-6);
+    margin-block-start: var(--space-6);
+    padding-block-start: var(--space-8);
+    border-block-start: 1px solid
+      color-mix(in srgb, var(--text-inverse) 30%, transparent);
+  }
+
+  .photos {
+    margin-block-start: var(--space-12);
+  }
+
+  @media (width >= 48rem) {
+    .origin {
+      padding-block: var(--space-32);
+    }
+
+    .question {
+      font-size: var(--text-4xl);
+    }
+
+    .columns {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-8);
+    }
+  }
+</style>

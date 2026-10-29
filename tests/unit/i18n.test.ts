@@ -41,6 +41,8 @@ describe('routes', () => {
     expect(routePath('branches', 'en')).toBe('en/branches/');
     expect(routePath('home', 'es')).toBe('');
     expect(routePath('home', 'en')).toBe('en/');
+    expect(routePath('wholesale', 'es')).toBe('wholesale/');
+    expect(routePath('wholesale', 'en')).toBe('en/wholesale/');
   });
 
   it('todas las rutas terminan en barra (o son la raíz) y no se repiten', () => {

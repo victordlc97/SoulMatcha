@@ -1,8 +1,8 @@
 ---
-import { Image } from 'astro:assets';
 import { getLocale, useTranslations } from '../../i18n';
 import SectionTitle from '../../shared/components/SectionTitle.astro';
 import { galleryImages } from '../gallery/gallery';
+import Photo from '../gallery/Photo.astro';
 
 const t = useTranslations(getLocale(Astro));
 // Las dos primeras de gallery/historia/. El resto queda disponible para una galería de historia.
@@ -12,36 +12,39 @@ const alt = t.gallery.historia;
 
 <!--
   SECCIÓN "NOSOTROS". Composición asimétrica: un texto de marca y dos fotografías.
-  Pendiente de contenido del cliente: el bloque .copy por el texto real (idealmente desde src/content/).
+  Texto: págs. 2 del deck de mayoreo (traducido al español; pendiente de revisión del cliente).
 -->
 <section id="nosotros" class="about" aria-labelledby="about-title">
   <div class="container grid">
     <div class="copy">
       <SectionTitle id="about-title">{t.about.title}</SectionTitle>
-      <p class="pending">{t.about.pending}</p>
+      <p>{t.about.story1}</p>
+      <p>{t.about.story2}</p>
     </div>
 
     {tall && (
-      <Image
-        class="frame tall"
-        src={tall}
-        alt={alt}
-        format="webp"
-        widths={[480, 800, 1200]}
-        sizes="(min-width: 48rem) 33vw, 100vw"
-        loading="lazy"
-      />
+      <div class="tall">
+        <Photo
+          image={tall}
+          alt={alt}
+          group="historia"
+          ratio="4 / 5"
+          widths={[480, 800, 1200]}
+          sizes="(min-width: 48rem) 33vw, 50vw"
+        />
+      </div>
     )}
     {square && (
-      <Image
-        class="frame square"
-        src={square}
-        alt={alt}
-        format="webp"
-        widths={[360, 640, 960]}
-        sizes="(min-width: 48rem) 25vw, 100vw"
-        loading="lazy"
-      />
+      <div class="square">
+        <Photo
+          image={square}
+          alt={alt}
+          group="historia"
+          ratio="1"
+          widths={[360, 640, 960]}
+          sizes="(min-width: 48rem) 25vw, 50vw"
+        />
+      </div>
     )}
   </div>
 </section>
@@ -63,24 +66,19 @@ const alt = t.gallery.historia;
     align-content: start;
   }
 
-  .pending {
-    color: var(--text-secondary);
-  }
+  /* Móvil: el texto arriba y las dos fotos lado a lado, alineadas por abajo. Apiladas a ancho
+     completo ocupaban casi dos pantallas. */
+  @media (width < 48rem) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4);
+      align-items: end;
+    }
 
-  .frame {
-    inline-size: 100%;
-    block-size: auto;
-    object-fit: cover;
-    border-radius: var(--radius-lg);
-    background: var(--surface-alt);
-  }
-
-  .tall {
-    aspect-ratio: 4 / 5;
-  }
-
-  .square {
-    aspect-ratio: 1;
+    .copy {
+      grid-column: 1 / -1;
+      margin-block-end: var(--space-4);
+    }
   }
 
   @media (width >= 48rem) {

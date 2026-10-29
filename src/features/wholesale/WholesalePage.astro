@@ -1,0 +1,190 @@
+---
+import { Image } from 'astro:assets';
+import { getLocale, useTranslations } from '../../i18n';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionTitle from '../../shared/components/SectionTitle.astro';
+import { wholesaleEmail } from './contact';
+import bar from './bar.jpg';
+
+/**
+ * PÁGINA DE MAYOREO Y ALIANZAS (deck de mayoreo, págs. 9, 10, 12 y 14). La usan /wholesale/ y /en/wholesale/.
+ * Quedó fuera a propósito: la lista de marcas aliadas (pág. 13; requiere permiso de cada marca)
+ * y la lista de precios (pág. 11).
+ */
+const t = useTranslations(getLocale(Astro));
+const w = t.wholesale;
+---
+
+<BaseLayout
+  title={w.metaTitle}
+  description={w.description}
+  routeKey="wholesale"
+>
+  <section class="intro" aria-labelledby="wholesale-title">
+    <div class="container">
+      <SectionTitle id="wholesale-title" level="h1">
+        {w.title}
+      </SectionTitle>
+    </div>
+  </section>
+
+  <section class="bar" aria-labelledby="bar-title" data-header-surface="dark">
+    <div class="container">
+      <div class="panel">
+        <div class="copy">
+          <h2 id="bar-title">{w.barTitle}</h2>
+          <p>{w.bar1}</p>
+          <p>{w.bar2}</p>
+          <p>{w.bar3}</p>
+        </div>
+        <Image
+          class="photo"
+          src={bar}
+          alt={t.gallery.historia}
+          format="webp"
+          widths={[480, 800, 1200]}
+          sizes="(min-width: 48rem) 50vw, 100vw"
+          loading="lazy"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="wholesale" aria-labelledby="wholesale-terms">
+    <div class="container">
+      <div class="card">
+        <h2 id="wholesale-terms">{w.mayoreoTitle}</h2>
+        <p class="text">{w.mayoreoText}</p>
+        <p class="contact">
+          {w.contact}{' '}
+          <a class="mail" href={`mailto:${wholesaleEmail}`}>
+            {wholesaleEmail}
+          </a>
+        </p>
+      </div>
+      <p class="closing" lang="es">
+        {w.closing}
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .intro {
+    /* Deja espacio al header flotante, que aquí no tiene hero debajo. */
+    padding-block: var(--space-32) var(--space-8);
+  }
+
+  /* Panel dividido del deck (pág. 9): texto sobre café a un lado, foto al otro. */
+  .panel {
+    display: grid;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--surface-inverse);
+    color: var(--text-inverse);
+  }
+
+  .copy {
+    display: grid;
+    gap: var(--space-4);
+    align-content: center;
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .copy h2 {
+    color: var(--text-blush-on-inverse);
+    font-size: var(--text-3xl);
+    line-height: var(--leading-tight);
+  }
+
+  .photo {
+    inline-size: 100%;
+    block-size: 100%;
+    min-block-size: 20rem;
+    object-fit: cover;
+    object-position: 50% 30%;
+  }
+
+  .wholesale {
+    padding-block: var(--space-16);
+  }
+
+  /* Panel rosa como las láminas de contacto del deck. Texto café profundo sobre Sundown (> 6:1);
+     el enlace va subrayado y hereda el color: no depende del verde de acción sobre rosa. */
+  .card {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-8) var(--space-6);
+    border-radius: var(--radius-lg);
+    background: var(--surface-blush);
+    color: var(--text-on-rose);
+  }
+
+  .wholesale h2 {
+    font-size: var(--text-3xl);
+    line-height: var(--leading-tight);
+  }
+
+  .text {
+    max-inline-size: 48ch;
+  }
+
+  .contact {
+    display: grid;
+    gap: var(--space-1);
+    margin-block-start: var(--space-4);
+  }
+
+  .mail {
+    color: inherit;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    overflow-wrap: anywhere;
+    transition: text-decoration-thickness var(--duration-fast)
+      var(--ease-out-soft);
+  }
+
+  .mail:hover {
+    text-decoration-thickness: 3px;
+  }
+
+  .closing {
+    margin-block-start: var(--space-16);
+    color: var(--text-secondary);
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-style: italic;
+  }
+
+  @media (width >= 48rem) {
+    .bar {
+      padding-block: var(--space-8);
+    }
+
+    .panel {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .copy {
+      padding: var(--space-16) var(--space-12);
+    }
+
+    .photo {
+      min-block-size: 0;
+    }
+
+    .wholesale {
+      padding-block: var(--space-24) var(--space-32);
+    }
+
+    .card {
+      padding: var(--space-16) var(--space-12);
+    }
+
+    .mail {
+      font-size: var(--text-3xl);
+    }
+  }
+</style>

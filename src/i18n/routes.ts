@@ -7,6 +7,7 @@ import { defaultLocale, type Locale } from './config';
 export const routes = {
   home: { es: '', en: 'en/' },
   branches: { es: 'sucursales/', en: 'en/branches/' },
+  wholesale: { es: 'wholesale/', en: 'en/wholesale/' },
   privacy: { es: 'privacidad/', en: 'en/privacy/' },
   cookies: { es: 'cookies/', en: 'en/cookies/' },
 } as const satisfies Record<string, Record<Locale, string>>;

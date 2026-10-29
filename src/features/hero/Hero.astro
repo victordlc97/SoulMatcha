@@ -1,40 +1,53 @@
 ---
 import { getLocale, href, useTranslations } from '../../i18n';
 import Button from '../../shared/components/Button.astro';
-import SectionTitle from '../../shared/components/SectionTitle.astro';
+import { withBase } from '../../shared/url';
 
 const locale = getLocale(Astro);
 const t = useTranslations(locale);
 
 /*
- * Hero a pantalla completa.
- * Para poner la foto: pasar un <img> al slot "media", por ejemplo
- *   <Hero><Image slot="media" src={foto} alt="" /></Hero>
- * La foto es decorativa (alt vacío): el contenido con significado va en HTML real.
+ * HERO con el video de marca (public/hero/hero.mp4: vertical 720×1280, sin audio, 49.5 s, ~7 MB,
+ * H.264 CRF 29; se recortó la tarjeta final negra. El master HEVC de 508 MB y 53 s está en
+ * Drive/Galería/SM_long.mov y NO va al repositorio).
+ * - Móvil: el video llena la pantalla (es vertical, encaja) con degradado de legibilidad.
+ * - Escritorio (≥ 64rem): el video vertical NO se estira a pantalla completa (se ampliaría 3× y
+ *   se recortaría a una franja): va en un arco a la derecha, a tamaño casi nativo, y el slogan
+ *   queda sobre café sólido.
+ * El video es decorativo (aria-hidden): lo que tiene significado va en HTML real. Se reproduce solo
+ * si la persona no pidió movimiento reducido (hero-video.ts) y tiene botón de pausa (WCAG 2.2.2).
  */
+const video = withBase('hero/hero.mp4');
+const poster = withBase('hero/hero-poster.webp');
 ---
 
 <section class="hero" aria-labelledby="hero-title" data-header-surface="dark">
   <div class="media" aria-hidden="true">
-    <slot name="media">
-      <div class="placeholder"></div>
-    </slot>
+    <video
+      class="film"
+      data-hero-video
+      muted
+      loop
+      playsinline
+      preload="auto"
+      poster={poster}
+      tabindex="-1"
+    >
+      <source src={video} type="video/mp4" />
+    </video>
   </div>
 
   <div class="container content">
-    <div class="title">
-      <SectionTitle
-        id="hero-title"
-        level="h1"
-        size="display"
-        accent={t.hero.titleAccent}
-      >
-        {t.hero.titleLead}
-      </SectionTitle>
-    </div>
+    <!-- Slogan en tres renglones, como en el deck: capitales, cursiva en minúscula y capitales.
+         Los {' '} son necesarios: Astro quita el espacio entre inline separados por salto de línea. -->
+    <h1 id="hero-title" class="slogan">
+      <span class="caps">{t.hero.sloganTop}</span>{' '}
+      <span class="italic">{t.hero.sloganItalic}</span>{' '}
+      <span class="caps">{t.hero.sloganBottom}</span>
+    </h1>
 
     <div class="actions">
-      <Button href={href('home', locale, '#producto')} variant="rose" size="sm">
+      <Button href={href('home', locale, '#nosotros')} variant="ink" size="sm">
         {t.hero.ctaPrimary}
       </Button>
       <Button href={href('branches', locale)} variant="secondary" size="sm">
@@ -42,47 +55,68 @@ const t = useTranslations(locale);
       </Button>
     </div>
   </div>
+
+  <!-- Oculto hasta que el JavaScript lo activa: sin JS el video no se reproduce y no hace falta. -->
+  <button
+    type="button"
+    class="toggle"
+    data-hero-toggle
+    data-label-pause={t.a11y.pauseVideo}
+    data-label-play={t.a11y.playVideo}
+    aria-label={t.a11y.pauseVideo}
+    hidden
+  >
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <path
+        class="icon-pause"
+        d="M8 5v14M16 5v14"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+      ></path>
+      <path class="icon-play" d="M8 5l11 7-11 7z" fill="currentColor"></path>
+    </svg>
+  </button>
 </section>
 
 <style>
   .hero {
+    /* Geometría del arco del video (escritorio). */
+    --arch-width: min(30rem, 36vw);
+    --arch-end: max(
+      var(--gutter),
+      calc((100vw - var(--container-max)) / 2 + var(--gutter))
+    );
+    --play: paused; /* entrada animada: corre cuando termina la pantalla de carga */
+
     position: relative;
     display: grid;
     align-items: end;
     min-block-size: 100svh;
     overflow: hidden;
-    background: var(--surface-inverse);
-    color: var(--text-inverse);
+    background: var(--surface-hero);
+    color: var(--text-on-hero);
   }
 
-  /* Capas explícitas: foto (0) < degradado de legibilidad (1) < contenido (2).
+  /* Capas explícitas: video (0) < degradado de legibilidad (1) < contenido y botón (2).
      Sin z-index el ::before se pintaba DEBAJO de la foto y no se veía. */
   .media {
     position: absolute;
     inset: 0;
     z-index: 0;
-    transform-origin: center;
   }
 
-  .media :global(picture) {
+  .film {
     display: block;
     inline-size: 100%;
     block-size: 100%;
-  }
-
-  .media :global(img) {
-    inline-size: 100%;
-    block-size: 100%;
     object-fit: cover;
-
-    /* Punto de interés (la lata) al centro de la foto (50 % en x e y): sigue visible en cualquier
-       proporción de pantalla y es el origen del zoom. */
-    object-position: 50% 50%;
+    object-position: 50% 40%;
   }
 
-  /* Degradados de legibilidad: uno vertical y otro localizado en la esquina del texto (no toca la lata).
-     Oscurecen la parte baja para que el texto crema cumpla contraste
-     sobre la mano y el follaje. Va en .hero (no en .media) para que no escale con el zoom. */
+  /* Móvil: degradado bajo el texto. Oscurece lo de abajo (y la esquina del slogan) para que el rosa
+     cumpla contraste sobre cualquier fotograma. Va en .hero para no depender del video. */
   .hero::before {
     content: '';
     position: absolute;
@@ -90,17 +124,17 @@ const t = useTranslations(locale);
     z-index: 1;
     background:
       radial-gradient(
-        ellipse 75% 45% at 8% 100%,
-        color-mix(in srgb, var(--scrim-ink) 62%, transparent) 0%,
-        color-mix(in srgb, var(--scrim-ink) 30%, transparent) 60%,
+        ellipse 90% 60% at 10% 100%,
+        color-mix(in srgb, var(--scrim-ink) 82%, transparent) 0%,
+        color-mix(in srgb, var(--scrim-ink) 50%, transparent) 60%,
         transparent 100%
       ),
       linear-gradient(
         to top,
-        color-mix(in srgb, var(--scrim-ink) 82%, transparent) 0%,
-        color-mix(in srgb, var(--scrim-ink) 60%, transparent) 18%,
-        color-mix(in srgb, var(--scrim-ink) 22%, transparent) 36%,
-        transparent 50%
+        color-mix(in srgb, var(--scrim-ink) 84%, transparent) 0%,
+        color-mix(in srgb, var(--scrim-ink) 60%, transparent) 22%,
+        color-mix(in srgb, var(--scrim-ink) 18%, transparent) 45%,
+        transparent 60%
       );
     pointer-events: none;
   }
@@ -114,10 +148,27 @@ const t = useTranslations(locale);
     padding-block: var(--space-24) var(--space-12);
   }
 
-  /* Sombra suave para el trazo fino del script. */
-  .title {
+  /* Trazo fino de la serif de display: sombra suave para que no se pierda sobre el follaje. */
+  .slogan {
+    display: grid;
+    color: var(--text-on-hero);
+    font-size: var(--text-slogan);
+    line-height: 0.98;
     text-shadow: 0 2px 24px
       color-mix(in srgb, var(--color-west-coast) 70%, transparent);
+  }
+
+  .slogan span {
+    display: block;
+  }
+
+  .slogan .caps {
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .slogan .italic {
+    font-style: italic;
   }
 
   .actions {
@@ -127,6 +178,43 @@ const t = useTranslations(locale);
     gap: var(--space-3);
     inline-size: 100%;
     max-inline-size: 16rem;
+  }
+
+  .toggle {
+    position: absolute;
+    inset-block-end: var(--space-4);
+    inset-inline-end: var(--gutter);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--tap-target);
+    block-size: var(--tap-target);
+    padding: 0;
+    border: 1px solid var(--glass-border-dark);
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--scrim-ink) 55%, transparent);
+    color: var(--text-inverse);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out-soft);
+  }
+
+  .toggle[hidden] {
+    display: none;
+  }
+
+  .toggle:hover {
+    background: color-mix(in srgb, var(--scrim-ink) 80%, transparent);
+  }
+
+  /* Un solo icono según el estado: pausado (data-paused) muestra "play". */
+  .toggle .icon-play,
+  .toggle[data-paused] .icon-pause {
+    display: none;
+  }
+
+  .toggle[data-paused] .icon-play {
+    display: block;
   }
 
   @media (width >= 40rem) {
@@ -141,45 +229,127 @@ const t = useTranslations(locale);
     }
   }
 
-  /* Reserva visual mientras no hay foto: degradado de marca con luces suaves,
-     para que el zoom y el vidrio del header se puedan evaluar. */
-  .placeholder {
-    inline-size: 100%;
-    block-size: 100%;
-    background:
-      radial-gradient(
-        55% 45% at 72% 28%,
-        color-mix(in srgb, var(--color-sundown) 75%, transparent),
-        transparent
-      ),
-      radial-gradient(
-        45% 55% at 18% 78%,
-        color-mix(in srgb, var(--color-matcha) 45%, transparent),
-        transparent
-      ),
-      var(--gradient-brand);
-  }
-
-  /* Zoom ligado al scroll: solo CSS, sin JavaScript.
-     Navegadores sin animation-timeline muestran la foto estática. */
-  @keyframes zoom-out-of-view {
-    from {
-      transform: scale(1);
+  /* Escritorio: slogan sobre café sólido y el video vertical en un arco (motivo de las láminas del
+     deck), a la altura de la pantalla (480 px de CSS = 960 px en pantallas retina; el video tiene 720). */
+  @media (width >= 64rem) {
+    .hero::before {
+      display: none;
     }
 
-    to {
-      transform: scale(1.25);
+    .media {
+      inset-block: var(--space-24) 0;
+      inset-inline: auto var(--arch-end);
+      inline-size: var(--arch-width);
+      overflow: hidden;
+      border-start-start-radius: 999px;
+      border-start-end-radius: 999px;
+    }
+
+    .toggle {
+      inset-block-end: var(--space-6);
+      inset-inline-end: max(
+        calc(var(--gutter) + var(--space-4)),
+        calc(
+          (100vw - var(--container-max)) / 2 + var(--gutter) + var(--space-4)
+        )
+      );
+    }
+
+    /* El slogan ya no está sobre una foto: la sombra solo ensuciaría el café. Con la columna
+       izquierda libre, se agranda para que sea el protagonista; el interlineado se cierra porque la
+       serif de display, en grande, pide aire corto entre renglones. */
+    .slogan {
+      font-size: var(--text-slogan-lg);
+      line-height: 0.94;
+      text-shadow: none;
     }
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: scroll()) {
+  /* ENTRADA (un solo momento): tras la pantalla de carga, el arco se revela y los tres renglones del
+     slogan suben uno tras otro; los botones cierran. Solo con movimiento permitido y JavaScript activo
+     (sin JS el loader no corre y el contenido debe verse). Los elementos nacen ocultos y en pausa;
+     al marcarse data-loader="done" (loader.astro, o antes del primer pintado si ya se vio) corren. */
+  @media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+    .slogan span,
+    .actions,
+    .media {
+      animation-duration: var(--duration-slow);
+      animation-timing-function: var(--ease-out-soft);
+      animation-fill-mode: both;
+      animation-play-state: var(--play);
+    }
+
+    .slogan span {
+      animation-name: line-rise;
+    }
+
+    .slogan span:nth-of-type(2) {
+      animation-delay: var(--stagger);
+    }
+
+    .slogan span:nth-of-type(3) {
+      animation-delay: calc(var(--stagger) * 2);
+    }
+
+    .actions {
+      animation-name: fade-in;
+      animation-delay: calc(var(--stagger) * 4);
+    }
+
+    /* En móvil el video llena la pantalla: solo aparece. En escritorio el arco se "abre" con un
+       acercamiento leve. */
+    .media {
+      animation-name: fade-in;
+    }
+
+    @media (width >= 64rem) {
       .media {
-        animation: zoom-out-of-view linear both;
-        animation-timeline: scroll(root);
-        animation-range: 0 100svh;
-        will-change: transform;
+        animation-name: arch-reveal;
       }
+    }
+
+    @keyframes line-rise {
+      from {
+        opacity: 0;
+        transform: translateY(0.3em);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes arch-reveal {
+      from {
+        opacity: 0;
+        transform: scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    :global(html[data-loader='done']) .hero {
+      --play: running;
     }
   }
 </style>
+
+<script>
+  import { initHeroVideo } from '../../shared/motion/hero-video';
+
+  initHeroVideo();
+</script>

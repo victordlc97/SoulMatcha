@@ -1,0 +1,181 @@
+---
+import { getLocale, useTranslations } from '../../i18n';
+
+const t = useTranslations(getLocale(Astro));
+---
+
+<!-- Visor de fotos ampliadas: uno por página, lo abren los botones [data-lightbox] (ver lightbox.ts). -->
+<dialog class="lightbox" data-lightbox-dialog aria-label={t.gallery.dialog}>
+  <button
+    type="button"
+    class="control close"
+    data-lightbox-close
+    aria-label={t.gallery.close}
+  >
+    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+      <path
+        d="M6 6l12 12M18 6L6 18"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      ></path>
+    </svg>
+  </button>
+
+  <button
+    type="button"
+    class="control prev"
+    data-lightbox-prev
+    aria-label={t.gallery.prev}
+  >
+    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+      <path
+        d="M15 5l-7 7 7 7"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </svg>
+  </button>
+
+  <figure>
+    <img data-lightbox-img alt="" />
+    <figcaption data-lightbox-count aria-live="polite"></figcaption>
+  </figure>
+
+  <button
+    type="button"
+    class="control next"
+    data-lightbox-next
+    aria-label={t.gallery.next}
+  >
+    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+      <path
+        d="M9 5l7 7-7 7"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </svg>
+  </button>
+</dialog>
+
+<style>
+  /* El diálogo ocupa toda la pantalla y es transparente: un clic en su fondo cierra el visor. */
+  .lightbox {
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    max-inline-size: none;
+    max-block-size: none;
+    margin: 0;
+    padding: var(--space-4);
+    border: 0;
+    background: transparent;
+    color: var(--text-inverse);
+  }
+
+  .lightbox[open] {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .lightbox::backdrop {
+    background: color-mix(in srgb, var(--scrim-ink) 90%, transparent);
+  }
+
+  figure {
+    display: grid;
+    grid-column: 2;
+    gap: var(--space-3);
+    justify-items: center;
+    margin: 0;
+  }
+
+  img {
+    max-inline-size: 100%;
+    max-block-size: calc(100dvh - var(--space-24));
+    border-radius: var(--radius-lg);
+    object-fit: contain;
+  }
+
+  figcaption {
+    font-size: var(--text-sm);
+  }
+
+  .control {
+    display: grid;
+    place-items: center;
+    inline-size: var(--tap-target);
+    block-size: var(--tap-target);
+    padding: 0;
+    border: 1px solid var(--glass-border-dark);
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--scrim-ink) 55%, transparent);
+    color: var(--text-inverse);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out-soft);
+  }
+
+  .control:hover {
+    background: var(--hover-tint-dark);
+  }
+
+  .control[hidden] {
+    display: none;
+  }
+
+  .close {
+    position: absolute;
+    inset-block-start: var(--space-4);
+    inset-inline-end: var(--space-4);
+  }
+
+  .prev {
+    grid-column: 1;
+  }
+
+  .next {
+    grid-column: 3;
+  }
+
+  /* Móvil: las flechas bajan sobre la foto para no restarle ancho. */
+  @media (width < 40rem) {
+    .lightbox[open] {
+      grid-template-columns: minmax(0, 1fr);
+      align-content: center;
+    }
+
+    figure {
+      grid-column: 1;
+    }
+
+    .prev,
+    .next {
+      position: absolute;
+      inset-block-end: var(--space-6);
+      grid-column: auto;
+    }
+
+    .prev {
+      inset-inline-start: var(--space-6);
+    }
+
+    .next {
+      inset-inline-end: var(--space-6);
+    }
+  }
+</style>
+
+<script>
+  import { initLightbox } from './lightbox';
+
+  initLightbox();
+</script>

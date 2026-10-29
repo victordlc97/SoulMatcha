@@ -43,8 +43,30 @@
     --color-west-coast-ink
   ); /* texto sobre botones rosa: 5.2:1 */
 
+  /* HERO. PRUEBA pedida por el cliente: fondo rosa del footer con letras blancas. Blanco sobre este
+     rosa = 1.89:1: no llega ni al 3:1 de texto grande (AA). Alternativas medidas: letras café
+     #4b432b sobre el mismo rosa 5.21:1 (o sobre Sundown 6.51:1); blanco sobre un rosa profundo
+     #a85b72 (fuera de la paleta) 4.77:1.
+     Para volver al hero café con slogan rosa: --surface-hero: var(--surface-inverse) y
+     --text-on-hero: var(--text-blush-on-inverse); y en Hero.astro el botón principal vuelve a
+     variant="rose". */
+  --surface-hero: var(--surface-footer);
+  --text-on-hero: var(--color-white);
+
   /* Solo titulares grandes (3.87:1). */
   --text-accent-on-inverse: var(--color-gold);
+
+  /* Rosa Sundown sobre café o sobre fotos oscuras con degradado (el slogan y los titulares del deck). */
+  --text-blush-on-inverse: var(--color-sundown);
+
+  /* Medido: rosa sobre café (--surface-inverse) 5.4:1; crema sobre café 6.96:1. Sobre la foto de
+     "Origen" (degradado --scrim-ink al 82 %), el peor caso (foto blanca) da crema 8.7:1, rosa 6.8:1.
+     Slogan del hero en móvil/tablet (sobre el video; ahora en blanco, --text-on-hero): medido en
+     píxeles reales con el contenido oculto, buscando 10 fotogramas repartidos (1 a 49 s) en 375, 412
+     y 768 px. Peor caso: percentil 95 >= 7.53 y percentil 99 >= 6.78 (texto grande: pide 3). Enlaces
+     del header, con el vidrio oscuro: percentil 95 >= 5.38 (texto normal: pide 4.5). En escritorio
+     el slogan va sobre el rosa sólido del hero (ver --surface-hero: la prueba en blanco da 1.89:1).
+     Revalidar si cambia el video del hero. */
   --text-link: var(--color-matcha-ink); /* solo sobre crema o blanco (4.95:1) */
   --action: var(--color-matcha);
   --action-contrast: var(
@@ -129,6 +151,15 @@
     2.1rem
   ); /* titular del hero: 26 px en móvil, 34 px en escritorio */
 
+  --text-slogan: clamp(
+    2.75rem,
+    7vw,
+    4.75rem
+  ); /* slogan del hero: 44 px en móvil, 76 px en escritorio */
+
+  /* Slogan del hero en escritorio (>= 64rem), donde el video va en un arco y queda toda la columna
+     izquierda libre: 9.5vw, entre 76 px (1024) y 144 px (>= 1516). */
+  --text-slogan-lg: clamp(4.75rem, 9.5vw, 9rem);
   --leading-tight: 1.15;
   --leading-heading: 1.25;
   --leading-body: 1.55;
@@ -174,6 +205,7 @@
   --duration-fast: 150ms;
   --duration-base: 300ms;
   --duration-slow: 600ms;
+  --stagger: 120ms; /* retraso entre elementos de una misma entrada */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
 }

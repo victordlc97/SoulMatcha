@@ -19,12 +19,13 @@ const locale = getLocale(Astro);
 const t = useTranslations(locale);
 
 const links = [
-  { label: t.nav.product, href: href('home', locale, '#producto') },
   { label: t.nav.about, href: href('home', locale, '#nosotros') },
+  { label: t.nav.product, href: href('home', locale, '#producto') },
   { label: t.nav.branches, href: href('branches', locale) },
+  { label: t.nav.wholesale, href: href('wholesale', locale) },
 ];
 
-// Escritorio: dos enlaces a la izquierda del logo; a la derecha, el tercero y el selector de idioma.
+// Escritorio: dos enlaces a la izquierda del logo; a la derecha, el resto y el selector de idioma.
 const start = links.slice(0, 2);
 const end = links.slice(2);
 

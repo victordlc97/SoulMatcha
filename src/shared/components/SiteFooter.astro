@@ -6,11 +6,12 @@ const locale = getLocale(Astro);
 const t = useTranslations(locale);
 const year = new Date().getFullYear();
 
+// Sucursales no va aquí: ya tiene su bloque propio al otro lado del footer (.connect).
 const sitemap = [
   { label: t.footer.home, href: href('home', locale) },
-  { label: t.nav.product, href: href('home', locale, '#producto') },
   { label: t.nav.about, href: href('home', locale, '#nosotros') },
-  { label: t.nav.branches, href: href('branches', locale) },
+  { label: t.nav.product, href: href('home', locale, '#producto') },
+  { label: t.nav.wholesale, href: href('wholesale', locale) },
 ];
 
 /**

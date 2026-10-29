@@ -1,0 +1,162 @@
+---
+import { Image, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { getLocale, useTranslations } from '../../i18n';
+
+interface Props {
+  image: ImageMetadata;
+  /** Texto alternativo de la foto (se usa también en el visor ampliado). */
+  alt: string;
+  /** Fotos del mismo grupo se recorren con las flechas del visor. */
+  group: string;
+  /** Posición (1…n) y total, para el nombre accesible del botón. */
+  position?: [number, number];
+  /** Proporción de la tarjeta. */
+  ratio?: string;
+  sizes?: string;
+  widths?: number[];
+}
+
+const {
+  image,
+  alt,
+  group,
+  position,
+  ratio = '4 / 5',
+  sizes = '(min-width: 48rem) 20rem, 72vw',
+  widths = [320, 480, 720, 960],
+} = Astro.props;
+
+const t = useTranslations(getLocale(Astro));
+const full = await getImage({ src: image, width: 1600, format: 'webp' });
+const label = position
+  ? `${t.gallery.enlarge}: ${alt}, ${position[0]}/${position[1]}`
+  : `${t.gallery.enlarge}: ${alt}`;
+---
+
+<!--
+  FOTO: botón que abre el visor ampliado. El efecto al pasar el mouse (o enfocar con teclado) es una
+  respuesta a la acción de la persona: la foto se acerca, se oscurece abajo y aparece el icono de
+  ampliar. Al tocar (sin hover) el icono se ve siempre, para que se entienda que se puede ampliar.
+  Dentro de un grupo, las demás fotos se atenúan (ver PhotoRail).
+-->
+<button
+  type="button"
+  class="photo"
+  style={`aspect-ratio: ${ratio}`}
+  data-lightbox={group}
+  data-full={full.src}
+  data-alt={alt}
+  aria-label={label}
+>
+  <Image
+    src={image}
+    alt=""
+    format="webp"
+    widths={widths}
+    sizes={sizes}
+    loading="lazy"
+  />
+  <span class="zoom" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="20" height="20">
+      <path
+        d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </svg>
+  </span>
+</button>
+
+<style>
+  .photo {
+    position: relative;
+    display: block;
+    isolation: isolate;
+    inline-size: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background: var(--surface-alt);
+    cursor: zoom-in;
+  }
+
+  .photo :global(img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-slow) var(--ease-out-soft);
+  }
+
+  /* Velo inferior: da apoyo al icono y ata la foto a la paleta (café de marca, no negro). */
+  .photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--scrim-ink) 55%, transparent),
+      transparent 55%
+    );
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out-soft);
+  }
+
+  .zoom {
+    position: absolute;
+    z-index: 1;
+    inset-block-end: var(--space-3);
+    inset-inline-end: var(--space-3);
+    display: grid;
+    place-items: center;
+    inline-size: var(--tap-target);
+    block-size: var(--tap-target);
+    border-radius: var(--radius-pill);
+    background: var(--surface-canvas);
+    color: var(--text-primary);
+    opacity: 0;
+    transform: translateY(var(--space-2));
+    transition:
+      opacity var(--duration-base) var(--ease-out-soft),
+      transform var(--duration-base) var(--ease-out-soft);
+  }
+
+  .photo:focus-visible :global(img) {
+    transform: scale(1.07);
+  }
+
+  .photo:focus-visible::after {
+    opacity: 1;
+  }
+
+  .photo:focus-visible .zoom {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (hover: hover) {
+    .photo:hover :global(img) {
+      transform: scale(1.07);
+    }
+
+    .photo:hover::after {
+      opacity: 1;
+    }
+
+    .photo:hover .zoom {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (hover: none) {
+    .zoom {
+      opacity: 0.92;
+      transform: none;
+    }
+  }
+</style>

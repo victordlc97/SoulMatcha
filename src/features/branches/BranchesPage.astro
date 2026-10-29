@@ -60,6 +60,19 @@ const t = useTranslations(locale);
               )}
               <h2 class="name">{item.name}</h2>
               <p class="address">{item.address}</p>
+              {item.hours.length > 0 && (
+                <section class="hours" aria-label={t.branches.hoursTitle}>
+                  <h3>{t.branches.hoursTitle}</h3>
+                  <dl>
+                    {item.hours.map((row) => (
+                      <div>
+                        <dt>{row.days}</dt>
+                        <dd>{row.time}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </section>
+              )}
               {branch.status === 'soon' && (
                 <p class="soon-text">{t.branches.soonText}</p>
               )}
@@ -159,6 +172,29 @@ const t = useTranslations(locale);
   }
 
   .address {
+    color: var(--text-secondary);
+  }
+
+  .hours h3 {
+    margin-block-end: var(--space-2);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: var(--weight-bold);
+  }
+
+  .hours dl {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .hours dl div {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .hours dd {
+    margin: 0;
     color: var(--text-secondary);
   }
 
