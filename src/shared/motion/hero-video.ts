@@ -3,36 +3,30 @@
  * lenta competía con el CSS, el JavaScript y las tipografías y retrasaba todo): el <video> nace con
  * preload="none" y solo se pide cuando la pantalla de carga terminó. Mientras tanto se ve el póster.
  *
- * No arranca solo (queda el póster y el botón ofrece reproducirlo; el video se pide entonces) si:
- * - la persona pidió movimiento reducido,
- * - activó el ahorro de datos, o
- * - su conexión es lenta (slow-2g, 2g o 3g según el navegador).
+ * Arranca solo, salvo que la persona haya pedido movimiento reducido (regla de accesibilidad del
+ * proyecto) o activado el ahorro de datos (decisión explícita suya). En esos casos queda el póster y
+ * el botón ofrece reproducirlo; el video se pide entonces.
+ * No se mira el tipo de conexión (`effectiveType`): es una estimación del navegador que suele
+ * equivocarse (clasifica como 3g conexiones que van bien) y dejaba sin video a quien sí podía verlo.
  *
  * El botón de pausa cumple WCAG 2.2.2 (todo movimiento de más de 5 s debe poder detenerse).
  * Sin JavaScript queda el póster.
  */
 
-/** Conexiones en las que 7 MB de video no valen la pena. */
-const SLOW_CONNECTIONS = ['slow-2g', '2g', '3g'];
-
 export interface PlaybackContext {
   reducedMotion: boolean;
   /** `navigator.connection.saveData`; `undefined` si el navegador no lo informa (Safari). */
   saveData: boolean | undefined;
-  /** `navigator.connection.effectiveType`; `undefined` si el navegador no lo informa. */
-  effectiveType: string | undefined;
 }
 
 export function shouldAutoplay({
   reducedMotion,
   saveData,
-  effectiveType,
 }: PlaybackContext): boolean {
-  if (reducedMotion || saveData) return false;
-  return !(effectiveType && SLOW_CONNECTIONS.includes(effectiveType));
+  return !reducedMotion && !saveData;
 }
 
-type NetworkInformation = { saveData?: boolean; effectiveType?: string };
+type NetworkInformation = { saveData?: boolean };
 
 function currentContext(reduced: MediaQueryList): PlaybackContext {
   const connection = (
@@ -41,7 +35,6 @@ function currentContext(reduced: MediaQueryList): PlaybackContext {
   return {
     reducedMotion: reduced.matches,
     saveData: connection?.saveData,
-    effectiveType: connection?.effectiveType,
   };
 }
 

@@ -1155,7 +1155,7 @@ test.describe('carga rápida en celular', () => {
     await expect.poll(() => videoStarted(page), { timeout: 10000 }).toBe(true);
   });
 
-  test('en conexión lenta (3g) tampoco se descarga el video por sí solo', async ({
+  test('aunque el navegador diga que la conexión es 3g, el video arranca solo', async ({
     page,
     browserName,
   }) => {
@@ -1170,7 +1170,9 @@ test.describe('carga rápida en celular', () => {
     });
     await page.goto('./');
     await loaderDone(page);
-    await page.waitForTimeout(1500);
-    expect(await videoStarted(page)).toBe(false);
+    await expect.poll(() => videoStarted(page), { timeout: 10000 }).toBe(true);
+    await expect(
+      page.getByRole('button', { name: 'Pausar video' }),
+    ).toBeVisible();
   });
 });

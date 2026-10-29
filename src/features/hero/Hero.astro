@@ -15,8 +15,8 @@ const t = useTranslations(locale);
  *   se recortaría a una franja): va en un arco a la derecha, a tamaño casi nativo, y el slogan
  *   queda sobre café sólido.
  * El video es decorativo (aria-hidden): lo que tiene significado va en HTML real. NO se descarga con
- * la página (preload="none"): arranca cuando termina la pantalla de carga y solo si no hay movimiento
- * reducido, ahorro de datos ni conexión lenta (hero-video.ts); tiene botón de pausa (WCAG 2.2.2).
+ * la página (preload="none"): arranca solo cuando termina la pantalla de carga, salvo con movimiento
+ * reducido o ahorro de datos (hero-video.ts); tiene botón de pausa (WCAG 2.2.2).
  */
 const video = withBase('hero/hero.mp4');
 const poster = withBase('hero/hero-poster.webp');
